@@ -39,7 +39,7 @@ namespace Компилятор
                 //Если операнд - кладём в Output
                 else if (IsOperand(Input[0]))
                 {
-                    Output.Add(TranslateToRPNSymbol(Input[0]));
+                    Output.Add(TranslateOperand(Input[0]));
                     Input.Remove(Input.First());
                 }
                 //while обрабатывается особым образом
@@ -76,6 +76,48 @@ namespace Компилятор
             }
             WriteMarks();
             return Output;
+        }
+        public static RPNSymbol TranslateOperand(Terminal input)
+        {
+            if (input is Terminal.TextLine)
+            {
+                var output = new RPNTextLine(ERPNType.A_TextLine);
+                var inp = input as Terminal.TextLine;
+                output.CharPointer = inp.CharPointer;
+                output.LinePointer = inp.LinePointer;
+                output.Data = inp.Data;
+                return output;
+            }
+            if (input is Terminal.TextLine)
+            {
+                var output = new RPNBoolean(ERPNType.A_Boolean);
+                var inp = input as Terminal.Boolean;
+                output.CharPointer = inp.CharPointer;
+                output.LinePointer = inp.LinePointer;
+                output.Data = inp.Data;
+                return output;
+            }
+            if (input is Terminal.Number)
+            {
+                var output = new RPNNumber(ERPNType.A_Number);
+                var inp = input as Terminal.Number;
+                output.CharPointer = inp.CharPointer;
+                output.LinePointer = inp.LinePointer;
+                output.Data = inp.Data;
+                return output;
+            }
+            if (input is Terminal.Identifier)
+            {
+                var output = new RPNIdentifier(ERPNType.A_VariableName);
+                var inp = input as Terminal.Identifier;
+                output.CharPointer = inp.CharPointer;
+                output.LinePointer = inp.LinePointer;
+                output.Name = inp.Name;
+                return output;
+            }
+            //заглушка чтобы он не ругался
+            var ou = new RPNSymbol(ERPNType.A_VariableName);
+            return ou;
         }
         public static void WriteMarks()
         {

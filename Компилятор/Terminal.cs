@@ -34,7 +34,7 @@
         }
         public class Boolean : Terminal
         {
-            public static bool Data { get; private set; }
+            public bool Data { get; private set; }
             public Boolean(ETerminalType type, int linePointer, int charPointer, string data) : base(type, linePointer, charPointer)
             {
                 if (type != ETerminalType.Boolean) throw new ArgumentException("Неверно создан нетерминал");
