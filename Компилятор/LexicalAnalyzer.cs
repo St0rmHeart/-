@@ -1,17 +1,19 @@
-﻿namespace Компилятор
-{
-    public class LexicalAnalyzer
-    {
-        public string Data { get; set; } = string.Empty;
-        public List<Terminal> Terminals { get; } = [];
-        private int Pointer { get; set; } = 0;
-        private char CurrentChar { get { return Data[Pointer]; } }
+﻿using System.Globalization;
 
-        private void ReadTerminal(ETerminalType terminalType)
+namespace Компилятор
+{
+    public static class LexicalAnalyzer
+    {
+        private static string Data { get; set; } = string.Empty;
+        private static List<Terminal> Terminals { get; } = [];
+        private static int Pointer { get; set; } = 0;
+        private static char CurrentChar { get { return Data[Pointer]; } }
+
+        private static void ReadTerminal(ETerminalType terminalType)
         {
             Terminals.Add(new Terminal(terminalType));
         }
-        private void ReadTerminal(ETerminalType terminalType, string value)
+        private static void ReadTerminal(ETerminalType terminalType, string value)
         {
             switch (terminalType)
             {
@@ -32,7 +34,7 @@
             }
             
         }
-        private string CurentCharGroup()
+        private static string CurentCharGroup()
         {
             if (CurrentChar >= '0' && CurrentChar <= '9')
                 return "<ц>";
@@ -74,16 +76,17 @@
 
             else throw new ArgumentOutOfRangeException("символ \"" + CurrentChar + "\" недопустим в грамматике");
         }
-        public bool IsLexicalCorrect()
+        public static (bool IsCorrect, List<Terminal> Terminals) IsLexicalCorrect(string data)
         {
+            Data = data;
             var dataLenght = Data.Length;
             while (Pointer < dataLenght)
             {
                 Start_Analyse();
             }
-            return true;
+            return (true, Terminals);
         }
-        private void Start_Analyse()
+        private static void Start_Analyse()
         {
             switch (CurentCharGroup())
             {
@@ -192,7 +195,7 @@
                     throw new Exception("Недопустимый символ.");
             }
         }
-        private void NUM_Analyse()
+        private static void NUM_Analyse()
         {
             string number = string.Empty;
             do
@@ -203,7 +206,7 @@
             while (CurentCharGroup() == "<ц>");
             ReadTerminal(ETerminalType.Number, number);
         }
-        private void ID_Analyse()
+        private static void ID_Analyse()
         {
             string identifier = string.Empty;
             do
@@ -253,7 +256,7 @@
             }
 
         }
-        private void STR_Analyse()
+        private static void STR_Analyse()
         {
             Pointer++;
             string textLine = string.Empty;
@@ -266,7 +269,7 @@
             Pointer++;
             ReadTerminal(ETerminalType.TextLine, textLine);
         }
-        private void LESS_Analyse()
+        private static void LESS_Analyse()
         {
             if (Data[Pointer+1] == '=')
             {
@@ -279,7 +282,7 @@
             }
             Pointer++;
         }
-        private void MORE_Analyse()
+        private static void MORE_Analyse()
         {
             if (Data[Pointer + 1] == '=')
             {
@@ -292,7 +295,7 @@
             }
             Pointer++;
         }
-        private void EQUAL_Analyse()
+        private static void EQUAL_Analyse()
         {
             if (Data[Pointer + 1] == '=')
             {
@@ -305,7 +308,7 @@
             }
             Pointer++;
         }
-        private void AND_Analyse()
+        private static void AND_Analyse()
         {
             if (Data[Pointer + 1] == '&')
             {
@@ -318,7 +321,7 @@
                 throw new NotImplementedException();
             }
         }
-        private void OR_Analyse()
+        private static void OR_Analyse()
         {
             if (Data[Pointer + 1] == '&')
             {

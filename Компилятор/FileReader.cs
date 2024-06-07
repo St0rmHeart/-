@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static System.Net.Mime.MediaTypeNames;
-
-namespace Компилятор
+﻿namespace Компилятор
 {
     /// <summary>
     /// Статический класс для считывания текста из файла
@@ -29,9 +22,9 @@ namespace Компилятор
         static string RemoveWhitespace(string input)
         {
             // Используем метод Replace для удаления нежелательных символов
-            return input.Replace(" ", "")
+            return input
                         .Replace("\t", "")
-                        .Replace("\n", "")
+                        .Replace("\n", " ")
                         .Replace("\r", "");
         }
     }

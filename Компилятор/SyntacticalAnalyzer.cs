@@ -1,6 +1,6 @@
 ﻿namespace Компилятор
 {
-    public class SyntacticalAnalyzer
+    public static class SyntacticalAnalyzer
     {
         /// <summary>
         /// Нахождение индекса парной закрывающейся скобки

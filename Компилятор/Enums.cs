@@ -191,117 +191,117 @@
         /// <summary>
         /// Output(A)
         /// </summary>
-        FuncOutput,
+        Func_Output,
 
         /// <summary>
         /// Input(A)
         /// </summary>
-        FuncInput,
+        Func_Input,
 
         /// <summary>
         /// a=b
         /// </summary>
-        FuncAssignment,        // =
+        Func_Assignment,        // =
 
         /// <summary>
         /// A&&B
         /// </summary>
-        FuncAnd,          // &&
+        Func_And,          // &&
 
         /// <summary>
         /// A||B
         /// </summary>
-        FuncOr,           // ||
+        Func_Or,           // ||
 
         /// <summary>
         /// A==B
         /// </summary>
-        FuncEqual,        // ==
+        Func_Equal,        // ==
 
         /// <summary>
         /// A<B
         /// </summary>
-        FuncLess,         // <
+        Func_Less,         // <
 
         /// <summary>
         /// A>B
         /// </summary>
-        FuncGreater,      // >
+        Func_Greater,      // >
 
         /// <summary>
         /// A<=B
         /// </summary>
-        FuncLessEqual,    // <=
+        Func_LessEqual,    // <=
 
         /// <summary>
         /// A>=B
         /// </summary>
-        FuncGreaterEqual, // >=
+        Func_GreaterEqual, // >=
 
         /// <summary>
         /// A+B
         /// </summary>
-        FuncPlus,         // +
+        Func_Plus,         // +
 
         /// <summary>
         /// A-B
         /// </summary>
-        FuncMinus,        // -
+        Func_Minus,        // -
 
         /// <summary>
         /// A*B
         /// </summary>
-        FuncMultiply,     // *
+        Func_Multiply,     // *
 
         /// <summary>
         /// A/B
         /// </summary>
-        FuncDivide,       // /
+        Func_Divide,       // /
 
         /// <summary>
         /// A%B
         /// </summary>
-        FuncModulus,      // %
+        Func_Modulus,      // %
 
         /// <summary>
         /// !A
         /// </summary>
-        FuncNot,          // !
+        Func_Not,          // !
 
         /// <summary>
         /// Взятие B-го элемента от массива A
         /// </summary>
-        FuncIndex,      //[]
+        Func_Index,      //[]
 
         /// <summary>
         /// int
         /// </summary>
-        FuncInt,
+        Func_Int,
 
         /// <summary>
         /// string
         /// </summary>
-        FuncString,
+        Func_String,
 
         /// <summary>
         /// Создание массива bool именем A числом элементов B
         /// </summary>
-        FuncBool,
+        Func_Bool,
 
         /// <summary>
         /// Создание массива int именем A числом элементов B
         /// </summary>
-        FuncIntArray,
+        Func_IntArray,
 
         /// <summary>
         /// Создание массива string именем A числом элементов B
         /// </summary>
-        FuncStringArray,
+        Func_StringArray,
 
         /// <summary>
         /// bool
         /// </summary>
-        FuncBoolArray,
+        Func_BoolArray,
 
         //АРГУМЕНТЫ
 

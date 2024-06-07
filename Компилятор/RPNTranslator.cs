@@ -14,8 +14,6 @@ namespace Компилятор
         List<Terminal> Input = new List<Terminal>();
         public List<RPNSymbol> Output = new List<RPNSymbol>();
         List<RPNSymbol> OperationStack = new List<RPNSymbol>();
-        bool ShouldPutMark1 = false;
-        bool ShouldPutMark2 = false;
         public List<RPNSymbol> Translate(List<Terminal> input)
         {
             Input = input;
@@ -58,7 +56,7 @@ namespace Компилятор
         }
         public static bool IsTerminal(Terminal input)
         {
-            if ((input.TerminalType == ETerminalType.Number) || (input.TerminalType == ETerminalType.TextLine) || (input.TerminalType == ETerminalType.Boolean) || (input.TerminalType == ETerminalType.Identifier))
+            if ((input.TerminalType == ETerminalType.Number) || (input.TerminalType == ETerminalType.TextLine) || (input.TerminalType == ETerminalType.Boolean) || (input.TerminalType == ETerminalType.VariableName))
             {
                 return true;
             }
@@ -74,7 +72,7 @@ namespace Компилятор
         }
         public static bool IsVariableInitialization(RPNSymbol input)
         {
-            if ((input.RPNType == ERPNType.FuncInt) || (input.RPNType == ERPNType.FuncString) || (input.RPNType == ERPNType.FuncBool))
+            if ((input.RPNType == ERPNType.Func_Int) || (input.RPNType == ERPNType.Func_String) || (input.RPNType == ERPNType.Func_Bool))
             {
                 return true;
             }
@@ -132,7 +130,7 @@ namespace Компилятор
                     }
                     else if (OperationStack.Count > 0)
                     {
-                        Output.Add(new RPNSymbol(ERPNType.FuncIndex));
+                        Output.Add(new RPNSymbol(ERPNType.Func_Index));
                         OperationStack.Remove(OperationStack.Last());
                     }
                 }
@@ -204,25 +202,25 @@ namespace Компилятор
         }
         public static RPNSymbol TranslateToRPNSymbol(Terminal input) => input.TerminalType switch
         {
-            ETerminalType.Assignment => new RPNSymbol(ERPNType.FuncAssignment),
-            ETerminalType.And => new RPNSymbol(ERPNType.FuncAnd),
-            ETerminalType.Or => new RPNSymbol(ERPNType.FuncOr),
-            ETerminalType.Equal => new RPNSymbol(ERPNType.FuncOr),
-            ETerminalType.Less => new RPNSymbol(ERPNType.FuncLess),
-            ETerminalType.Greater => new RPNSymbol(ERPNType.FuncGreater),
-            ETerminalType.LessEqual => new RPNSymbol(ERPNType.FuncLessEqual),
-            ETerminalType.GreaterEqual => new RPNSymbol(ERPNType.FuncGreaterEqual),
-            ETerminalType.Plus => new RPNSymbol(ERPNType.FuncPlus),
-            ETerminalType.Minus => new RPNSymbol(ERPNType.FuncMinus),
-            ETerminalType.Multiply => new RPNSymbol(ERPNType.FuncMultiply),
-            ETerminalType.Divide => new RPNSymbol(ERPNType.FuncDivide),
-            ETerminalType.Modulus => new RPNSymbol(ERPNType.FuncModulus),
-            ETerminalType.Not => new RPNSymbol(ERPNType.FuncNot),
-            ETerminalType.Int => new RPNSymbol(ERPNType.FuncInt),
-            ETerminalType.String => new RPNSymbol(ERPNType.FuncString),
-            ETerminalType.Bool => new RPNSymbol(ERPNType.FuncBool),
-            ETerminalType.Input => new RPNSymbol(ERPNType.FuncInput),
-            ETerminalType.Output => new RPNSymbol(ERPNType.FuncOutput),
+            ETerminalType.Assignment => new RPNSymbol(ERPNType.Func_Assignment),
+            ETerminalType.And => new RPNSymbol(ERPNType.Func_And),
+            ETerminalType.Or => new RPNSymbol(ERPNType.Func_Or),
+            ETerminalType.Equal => new RPNSymbol(ERPNType.Func_Or),
+            ETerminalType.Less => new RPNSymbol(ERPNType.Func_Less),
+            ETerminalType.Greater => new RPNSymbol(ERPNType.Func_Greater),
+            ETerminalType.LessEqual => new RPNSymbol(ERPNType.Func_LessEqual),
+            ETerminalType.GreaterEqual => new RPNSymbol(ERPNType.Func_GreaterEqual),
+            ETerminalType.Plus => new RPNSymbol(ERPNType.Func_Plus),
+            ETerminalType.Minus => new RPNSymbol(ERPNType.Func_Minus),
+            ETerminalType.Multiply => new RPNSymbol(ERPNType.Func_Multiply),
+            ETerminalType.Divide => new RPNSymbol(ERPNType.Func_Divide),
+            ETerminalType.Modulus => new RPNSymbol(ERPNType.Func_Modulus),
+            ETerminalType.Not => new RPNSymbol(ERPNType.Func_Not),
+            ETerminalType.Int => new RPNSymbol(ERPNType.Func_Int),
+            ETerminalType.String => new RPNSymbol(ERPNType.Func_String),
+            ETerminalType.Bool => new RPNSymbol(ERPNType.Func_Bool),
+            ETerminalType.Input => new RPNSymbol(ERPNType.Func_Input),
+            ETerminalType.Output => new RPNSymbol(ERPNType.Func_Output),
             ETerminalType.LeftBracket => new RPNSymbol(ERPNType.LeftBracket),
             ETerminalType.RightBracket => new RPNSymbol(ERPNType.RightBracket),
             ETerminalType.LeftParen => new RPNSymbol(ERPNType.LeftParen),
@@ -231,7 +229,7 @@ namespace Компилятор
             ETerminalType.RightBrace => new RPNSymbol(ERPNType.RightBrace),
             ETerminalType.If => new RPNSymbol(ERPNType.ConditionalJumpToMarkIf),
             ETerminalType.Else => new RPNSymbol(ERPNType.JumpToMarkElse),
-            ETerminalType.Identifier => new RPNSymbol(ERPNType.Identifier),
+            ETerminalType.VariableName => new RPNSymbol(ERPNType.Identifier),
             ETerminalType.Number => new RPNSymbol(ERPNType.Number),
             ETerminalType.TextLine => new RPNSymbol(ERPNType.TextLine),
             ETerminalType.Boolean => new RPNSymbol(ERPNType.Boolean),
@@ -249,36 +247,36 @@ namespace Компилятор
             ERPNType.LeftParen => -1,
             ERPNType.LeftBrace => -1,
 
-            ERPNType.FuncAssignment => 0,
-            ERPNType.FuncAnd => 1,
-            ERPNType.FuncOr => 1,
-            ERPNType.FuncEqual => 2,
-            ERPNType.FuncLess => 2,
-            ERPNType.FuncGreater => 2,
-            ERPNType.FuncLessEqual => 2,
-            ERPNType.FuncGreaterEqual => 2,
-            ERPNType.FuncPlus => 3,
-            ERPNType.FuncMinus => 3,
-            ERPNType.FuncMultiply => 4,
-            ERPNType.FuncDivide => 4,
-            ERPNType.FuncModulus => 4,
-            ERPNType.FuncNot => 5,
-            ERPNType.FuncInt => 6,
-            ERPNType.FuncString => 6,
-            ERPNType.FuncBool => 6,
-            ERPNType.FuncIntArray => 6,
-            ERPNType.FuncStringArray => 6,
-            ERPNType.FuncBoolArray => 6,
-            ERPNType.FuncInput => 7,
-            ERPNType.FuncOutput => 7,
-            ERPNType.FuncIndex => 8,
+            ERPNType.Func_Assignment => 0,
+            ERPNType.Func_And => 1,
+            ERPNType.Func_Or => 1,
+            ERPNType.Func_Equal => 2,
+            ERPNType.Func_Less => 2,
+            ERPNType.Func_Greater => 2,
+            ERPNType.Func_LessEqual => 2,
+            ERPNType.Func_GreaterEqual => 2,
+            ERPNType.Func_Plus => 3,
+            ERPNType.Func_Minus => 3,
+            ERPNType.Func_Multiply => 4,
+            ERPNType.Func_Divide => 4,
+            ERPNType.Func_Modulus => 4,
+            ERPNType.Func_Not => 5,
+            ERPNType.Func_Int => 6,
+            ERPNType.Func_String => 6,
+            ERPNType.Func_Bool => 6,
+            ERPNType.Func_IntArray => 6,
+            ERPNType.Func_StringArray => 6,
+            ERPNType.Func_BoolArray => 6,
+            ERPNType.Func_Input => 7,
+            ERPNType.Func_Output => 7,
+            ERPNType.Func_Index => 8,
             _ => throw new NotImplementedException("КРАШНУТЬСЯ НАФИГ НО ПОНИЖЕ")
         };
         public static ERPNType ToArrayInit(RPNSymbol input) => input.RPNType switch
         {
-            ERPNType.FuncInt => ERPNType.FuncIntArray,
-            ERPNType.FuncString => ERPNType.FuncStringArray,
-            ERPNType.FuncBool => ERPNType.FuncBoolArray,
+            ERPNType.Func_Int => ERPNType.Func_IntArray,
+            ERPNType.Func_String => ERPNType.Func_StringArray,
+            ERPNType.Func_Bool => ERPNType.Func_BoolArray,
             _ => throw new NotImplementedException("КРАШНУТЬСЯ НАФИГ НО ЕЩЁ НИЖЕ")
         };
     }
