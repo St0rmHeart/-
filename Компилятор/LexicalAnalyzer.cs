@@ -4,35 +4,79 @@ namespace Компилятор
 {
     public static class LexicalAnalyzer
     {
-        private static string Data { get; set; } = string.Empty;
+        private static string Data { get; set; }
         private static List<Terminal> Terminals { get; } = [];
-        private static int Pointer { get; set; } = 0;
-        private static char CurrentChar { get { return Data[Pointer]; } }
 
+        private static int _charPointer = 1;
+        private static int _linePointer = 1;
+        private static int _char = 1;
+
+        private static int _pointer = 0;
+        private static int Pointer
+        {
+            get
+            {
+                return _pointer;
+            }
+            set
+            {
+                _pointer++;
+                _charPointer++;
+                if(Data.ElementAtOrDefault(_pointer) == '\n')
+                {
+                    _linePointer++;
+                    _charPointer = 0;
+                    _char = 1;
+                }
+            }
+        }
+        private static char CurrentChar
+        {
+            get
+            {
+                return Data[Pointer];
+            }
+        }
+        public static bool IsLexicalCorrect(string data)
+        {
+            Data = data;
+
+
+          
+            while (Pointer < data.Length)
+            {
+                Start_Analyse();
+            }
+            return true;
+        }
+        public static List<Terminal> GetTerminals()
+        {
+            return Terminals;
+        }
         private static void ReadTerminal(ETerminalType terminalType)
         {
-            Terminals.Add(new Terminal(terminalType));
+            Terminals.Add(new Terminal(terminalType, _linePointer, _char));
         }
         private static void ReadTerminal(ETerminalType terminalType, string value)
         {
+            
             switch (terminalType)
             {
                 case ETerminalType.Number:
-                    Terminals.Add(new Terminal.Number(terminalType, value));
+                    Terminals.Add(new Terminal.Number(terminalType, _linePointer, _char, value));
                     break;
                 case ETerminalType.TextLine:
-                    Terminals.Add(new Terminal.TextLine(terminalType, value));
+                    Terminals.Add(new Terminal.TextLine(terminalType, _linePointer, _char, value));
                     break;
                 case ETerminalType.Boolean:
-                    Terminals.Add(new Terminal.Boolean(terminalType, value));
+                    Terminals.Add(new Terminal.Boolean(terminalType, _linePointer, _char, value));
                     break;
                 case ETerminalType.VariableName:
-                    Terminals.Add(new Terminal.Identifier(terminalType, value));
+                    Terminals.Add(new Terminal.Identifier(terminalType, _linePointer, _char, value));
                     break;
                 default:
                     throw new NotImplementedException("Невозможный тип терминала");
             }
-            
         }
         private static string CurentCharGroup()
         {
@@ -46,6 +90,7 @@ namespace Компилятор
 
             else if (CurrentChar == '\"') return "<\">";
             else if (CurrentChar == ' ') return "< >";
+            else if (CurrentChar == '\n') return "< >";
             else if (CurrentChar == ';') return "<;>";
 
             else if (CurrentChar == '+') return "<+>";
@@ -74,20 +119,18 @@ namespace Компилятор
                      CurrentChar == '.')
                 return "<o>";
 
-            else throw new ArgumentOutOfRangeException("символ \"" + CurrentChar + "\" недопустим в грамматике");
-        }
-        public static (bool IsCorrect, List<Terminal> Terminals) IsLexicalCorrect(string data)
-        {
-            Data = data;
-            var dataLenght = Data.Length;
-            while (Pointer < dataLenght)
+            else
             {
-                Start_Analyse();
+                Console.WriteLine($"Некорректный символ: {CurrentChar}" +
+                    $"\tСтрока {_linePointer};" +
+                    $"\tСимвол {_charPointer};");
+                throw new ArgumentOutOfRangeException("символ \"" + CurrentChar + "\" недопустим в грамматике");
             }
-            return (true, Terminals);
         }
+        
         private static void Start_Analyse()
         {
+            _char = _charPointer;
             switch (CurentCharGroup())
             {
                 case "<ц>":
@@ -192,6 +235,9 @@ namespace Компилятор
                     break;
 
                 default:
+                    Console.WriteLine($"Некорректный сомвол: {CurrentChar}" +
+                    $"\tСтрока {_linePointer};" +
+                    $"\tСимвол {_charPointer};");
                     throw new Exception("Недопустимый символ.");
             }
         }
@@ -318,6 +364,9 @@ namespace Компилятор
             }
             else
             {
+                Console.WriteLine($"Некорректный символ: {CurrentChar}" +
+                    $"\tСтрока {_linePointer};" +
+                    $"\tСимвол {_charPointer};");
                 throw new NotImplementedException();
             }
         }
@@ -331,6 +380,9 @@ namespace Компилятор
             }
             else
             {
+                Console.WriteLine($"Некорректный символ: {CurrentChar}" +
+                    $"\tСтрока {_linePointer};" +
+                    $"\tСимвол {_charPointer};");
                 throw new NotImplementedException();
             }
         }

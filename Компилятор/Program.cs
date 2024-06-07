@@ -5,16 +5,19 @@ namespace Компилятор
         public static void Main()
         {
             var code = FileReader.Read("data.txt");
-            var lexicalAnalizatorResult = LexicalAnalyzer.IsLexicalCorrect(code);
-            List<Terminal> terminals = [];
-            List<RPNSymbol> rpn = [];
-            if (lexicalAnalizatorResult.IsCorrect)
+
+            List<Terminal> terminals;
+            if (LexicalAnalyzer.IsLexicalCorrect(code))
             {
-                terminals = lexicalAnalizatorResult.Terminals;
+                terminals = LexicalAnalyzer.GetTerminals();
             }
-            bool isSyntacticalCorrect = SyntacticalAnalyzer.ParseInstructionBlock(terminals);
-            File.WriteAllText("SAlog.txt", SyntacticalAnalyzer.GetLog());
-            if (isSyntacticalCorrect)
+            else
+            {
+                throw new Exception();
+            }
+
+            List<RPNSymbol> rpn;
+            if (SyntacticalAnalyzer.IsSyntacticalCorrect(terminals))
             {
                 rpn = RPNTranslator.ConvertToRPN(terminals);
             }
@@ -22,6 +25,8 @@ namespace Компилятор
             {
                 throw new Exception();
             }
+
+
             foreach (var rpnsymvol in rpn)
             {
                 Console.WriteLine(rpnsymvol.RPNType);

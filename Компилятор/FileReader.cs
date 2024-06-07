@@ -10,21 +10,18 @@
         /// </summary>
         public static string Read(string filePath)
         {
-            string text;
             // Считываем текст из файла
-            text = File.ReadAllText(filePath);
-            
+            string text = File.ReadAllText(filePath);
+
             // Удаляем все пробелы, переносы строк и символы табуляции
-            text = RemoveWhitespace(text);
-            return text;
+            string parsedText = RemoveWhitespace(text);
+            return parsedText;
         }
 
         static string RemoveWhitespace(string input)
         {
             // Используем метод Replace для удаления нежелательных символов
-            return input
-                        .Replace("\t", "")
-                        .Replace("\n", " ")
+            return input.Replace("\t", "")
                         .Replace("\r", "");
         }
     }

@@ -3,10 +3,7 @@
     public static class SyntacticalAnalyzer
     {
         private static string _log = string.Empty;
-        public static string GetLog()
-        {
-            return _log;
-        }
+        
         private static int _logCounter = 0;
         private static string _tabs = string.Empty;
         private static int _tabsCounter = 0;
@@ -43,7 +40,17 @@
             }
         }
 
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="terminals"></param>
+        /// <returns></returns>
+        public static bool IsSyntacticalCorrect(List<Terminal> terminals)
+        {
+            bool result = ParseInstructionBlock(terminals);
+            File.WriteAllText("SAlog.txt", Log);
+            return result;
+        }
 
         /// <summary>
         /// Нахождение индекса парной закрывающейся скобки
@@ -77,10 +84,13 @@
             return -1;
         }
 
+        
+
+
         /// <summary>
         /// 1. Блок инструкций
         /// </summary>
-        public static bool ParseInstructionBlock(List<Terminal> terminals)
+        private static bool ParseInstructionBlock(List<Terminal> terminals)
         {
             Tabs++;
             Log = $"1. <Блок инструкций> →";
