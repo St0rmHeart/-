@@ -727,10 +727,10 @@
                         if (terminals.ElementAtOrDefault(2)?.TerminalType == ETerminalType.Number)
                         {
                             // если следующий терминал ]
-                            if (terminals.ElementAtOrDefault(3)?.TerminalType == ETerminalType.Number)
+                            if (terminals.ElementAtOrDefault(3)?.TerminalType == ETerminalType.RightBracket)
                             {
                                 // если следующий терминал идентификатор
-                                if (terminals.ElementAtOrDefault(4)?.TerminalType == ETerminalType.Number)
+                                if (terminals.ElementAtOrDefault(4)?.TerminalType == ETerminalType.VariableName)
                                 {
                                     Log = $"3.1 int[ЧИСЛО] НАЗВАНИЕ ПЕРЕМЕННОЙ → TRUE";
                                     Tabs--;
@@ -756,10 +756,10 @@
                         if (terminals.ElementAtOrDefault(2)?.TerminalType == ETerminalType.Number)
                         {
                             // если следующий терминал ]
-                            if (terminals.ElementAtOrDefault(3)?.TerminalType == ETerminalType.Number)
+                            if (terminals.ElementAtOrDefault(3)?.TerminalType == ETerminalType.RightBracket)
                             {
                                 // если следующий терминал идентификатор
-                                if (terminals.ElementAtOrDefault(4)?.TerminalType == ETerminalType.Number)
+                                if (terminals.ElementAtOrDefault(4)?.TerminalType == ETerminalType.VariableName)
                                 {
                                     Log = $"3.2 bool[ЧИСЛО] НАЗВАНИЕ ПЕРЕМЕННОЙ → TRUE";
                                     Tabs--;
@@ -785,10 +785,10 @@
                         if (terminals.ElementAtOrDefault(2)?.TerminalType == ETerminalType.Number)
                         {
                             // если следующий терминал ]
-                            if (terminals.ElementAtOrDefault(3)?.TerminalType == ETerminalType.Number)
+                            if (terminals.ElementAtOrDefault(3)?.TerminalType == ETerminalType.RightBracket)
                             {
                                 // если следующий терминал идентификатор
-                                if (terminals.ElementAtOrDefault(4)?.TerminalType == ETerminalType.Number)
+                                if (terminals.ElementAtOrDefault(4)?.TerminalType == ETerminalType.VariableName)
                                 {
                                     Log = $"3.3 string[ЧИСЛО] НАЗВАНИЕ ПЕРЕМЕННОЙ → TRUE";
                                     Tabs--;
@@ -1900,6 +1900,36 @@
                 }
             }
             Log = $"21.3 ЧИСЛО → FALSE";
+
+            // 21.3 ЧИСЛО
+            Log = $"21.3 ЧИСЛО →";
+            // если в последователельности ровно один терминал
+            if (terminals.Count == 1)
+            {
+                // если первый терминал число
+                if (terminals.ElementAtOrDefault(0)?.TerminalType == ETerminalType.Number)
+                {
+                    Log = $"21.3 ЧИСЛО → TRUE";
+                    Tabs--;
+                    Log = $"21. <Индексатор> → TRUE";
+                    Tabs--;
+                    return true;
+                }
+            }
+            Log = $"21.3 ЧИСЛО → FALSE";
+
+            // 20.4 <Сложение и вычитание>
+            Log = $"20.4 <Сложение и вычитание> →";
+            // если посдевовательность удовлетворяет шаблону <Аргумент унарного минуса>
+            if (ParseAdditionAndSubtraction(terminals))
+            {
+                Log = $"20.4 <Сложение и вычитание> → TRUE";
+                Tabs--;
+                Log = $"21. <Индексатор> → TRUE";
+                Tabs--;
+                return true;
+            }
+            Log = $"20.4 <Сложение и вычитание> → FALSE";
 
             // последовательность не подпадает ни под один из шаблонов
             Tabs--;

@@ -7,15 +7,25 @@ namespace Компилятор
             var code = FileReader.Read("data.txt");
             var lexicalAnalizatorResult = LexicalAnalyzer.IsLexicalCorrect(code);
             List<Terminal> terminals = [];
+            List<RPNSymbol> rpn = [];
             if (lexicalAnalizatorResult.IsCorrect)
             {
                 terminals = lexicalAnalizatorResult.Terminals;
             }
-            SyntacticalAnalyzer.ParseInstructionBlock(terminals);
-            
-            var log = SyntacticalAnalyzer.GetLog();
-            // Записываем строку в файл
-            File.WriteAllText("SAlog.txt", log);
+            bool isSyntacticalCorrect = SyntacticalAnalyzer.ParseInstructionBlock(terminals);
+            File.WriteAllText("SAlog.txt", SyntacticalAnalyzer.GetLog());
+            if (isSyntacticalCorrect)
+            {
+                rpn = RPNTranslator.ConvertToRPN(terminals);
+            }
+            else
+            {
+                throw new Exception();
+            }
+            foreach (var rpnsymvol in rpn)
+            {
+                Console.WriteLine(rpnsymvol.RPNType);
+            }
         }
     }
 }

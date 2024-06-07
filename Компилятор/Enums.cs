@@ -191,206 +191,206 @@
         /// <summary>
         /// Output(A)
         /// </summary>
-        Func_Output,
+        F_Output,
 
         /// <summary>
         /// Input(A)
         /// </summary>
-        Func_Input,
+        F_Input,
 
         /// <summary>
         /// a=b
         /// </summary>
-        Func_Assignment,        // =
+        F_Assignment,        // =
 
         /// <summary>
         /// A&&B
         /// </summary>
-        Func_And,          // &&
+        F_And,          // &&
 
         /// <summary>
         /// A||B
         /// </summary>
-        Func_Or,           // ||
+        F_Or,           // ||
 
         /// <summary>
         /// A==B
         /// </summary>
-        Func_Equal,        // ==
+        F_Equal,        // ==
 
         /// <summary>
         /// A<B
         /// </summary>
-        Func_Less,         // <
+        F_Less,         // <
 
         /// <summary>
         /// A>B
         /// </summary>
-        Func_Greater,      // >
+        F_Greater,      // >
 
         /// <summary>
         /// A<=B
         /// </summary>
-        Func_LessEqual,    // <=
+        F_LessEqual,    // <=
 
         /// <summary>
         /// A>=B
         /// </summary>
-        Func_GreaterEqual, // >=
+        F_GreaterEqual, // >=
 
         /// <summary>
         /// A+B
         /// </summary>
-        Func_Plus,         // +
+        F_Plus,         // +
 
         /// <summary>
         /// A-B
         /// </summary>
-        Func_Minus,        // -
+        F_Minus,        // -
 
         /// <summary>
         /// A*B
         /// </summary>
-        Func_Multiply,     // *
+        F_Multiply,     // *
 
         /// <summary>
         /// A/B
         /// </summary>
-        Func_Divide,       // /
+        F_Divide,       // /
 
         /// <summary>
         /// A%B
         /// </summary>
-        Func_Modulus,      // %
+        F_Modulus,      // %
 
         /// <summary>
         /// !A
         /// </summary>
-        Func_Not,          // !
+        F_Not,          // !
 
         /// <summary>
         /// Взятие B-го элемента от массива A
         /// </summary>
-        Func_Index,      //[]
+        F_Index,      //[]
 
         /// <summary>
         /// int
         /// </summary>
-        Func_Int,
+        F_Int,
 
         /// <summary>
         /// string
         /// </summary>
-        Func_String,
+        F_String,
 
         /// <summary>
         /// Создание массива bool именем A числом элементов B
         /// </summary>
-        Func_Bool,
+        F_Bool,
 
         /// <summary>
         /// Создание массива int именем A числом элементов B
         /// </summary>
-        Func_IntArray,
+        F_IntArray,
 
         /// <summary>
         /// Создание массива string именем A числом элементов B
         /// </summary>
-        Func_StringArray,
+        F_StringArray,
 
         /// <summary>
         /// bool
         /// </summary>
-        Func_BoolArray,
+        F_BoolArray,
 
         //АРГУМЕНТЫ
 
         /// <summary>
         /// Целое число
         /// </summary>
-        Number,
+        A_Number,
 
         /// <summary>
         /// Строка текста
         /// </summary>
-        TextLine,
+        A_TextLine,
 
         /// <summary>
         /// True или False
         /// </summary>
-        Boolean,
+        A_Boolean,
 
         /// <summary>
-        /// Пользовательский идентификатор
+        /// Пользовательcкая переменная
         /// </summary>
-        Identifier,   // a...z, A...Z, _, а...я, А...Я
+        A_VariableName,   // a...z, A...Z, _, а...я, А...Я
 
         // Identifiers and keywords
 
         /// <summary>
         /// if
         /// </summary>
-        If,
+        T_If,
 
         /// <summary>
         /// else
         /// </summary>
-        Else,
+        T_Else,
 
         /// <summary>
         /// while
         /// </summary>
-        While,
+        T_While,
 
         /// <summary>
         /// ;
         /// </summary>
-        Semicolon,
+        T_Semicolon,
 
         /// <summary>
         /// (
         /// </summary>
-        LeftParen,    // (
+        T_LeftParen,    // (
 
         /// <summary>
         /// )
         /// </summary>
-        RightParen,   // )
+        T_RightParen,   // )
 
         /// <summary>
         /// [
         /// </summary>
-        LeftBracket,  // [
+        T_LeftBracket,  // [
 
         /// <summary>
         /// ]
         /// </summary>
-        RightBracket, // ]
+        T_RightBracket, // ]
 
         /// <summary>
         /// {
         /// </summary>
-        LeftBrace,    // {
+        T_LeftBrace,    // {
 
         /// <summary>
         /// }
         /// </summary>
-        RightBrace,   // }
+        T_RightBrace,   // }
 
         /// <summary>
         /// Если TRUE - выполняется идущий дальше код, иначе - переход к MarkIf
         /// </summary>
-        ConditionalJumpToMark,
+        F_ConditionalJumpToMark,
 
         /// <summary>
         /// Безусловный переход к MarkElse
         /// </summary>
-        UnconditionalJumpToMark,
+        F_UnconditionalJumpToMark,
 
         /// <summary>
-        /// Безусловный переход к MarkElse
+        /// Метка-указатель
         /// </summary>
-        Mark,
+        М_Mark,
     }
     public enum EMarkType
     {

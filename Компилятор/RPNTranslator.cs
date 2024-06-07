@@ -19,7 +19,7 @@ namespace Компилятор
         /// <summary>
         /// Возвращает список типа RPNTranslator в формате польской строки из входного списка типа Terminal
         /// </summary>
-        public static List<RPNSymbol> Translate(List<Terminal> input)
+        public static List<RPNSymbol> ConvertToRPN(List<Terminal> input)
         {
             Input = input;
             while (Input.Count > 0)
@@ -44,18 +44,18 @@ namespace Компилятор
                 //while обрабатывается особым образом
                 else if (Input[0].TerminalType == ETerminalType.While)
                 {
-                    OperationStack.Add(new RPNSymbol(ERPNType.ConditionalJumpToMark));
-                    OperationStack.Add(new RPNSymbol(ERPNType.Mark));
-                    TempMarks.Add(new RPNMark(ERPNType.Mark, EMarkType.WhileBeginMark));
+                    OperationStack.Add(new RPNSymbol(ERPNType.F_ConditionalJumpToMark));
+                    OperationStack.Add(new RPNSymbol(ERPNType.М_Mark));
+                    TempMarks.Add(new RPNMark(ERPNType.М_Mark, EMarkType.WhileBeginMark));
                     TempMarks.Last().Position = Output.Count;
                     Input.Remove(Input.First());
                 }
                 //if обрабатывается особым образом
                 else if (Input[0].TerminalType == ETerminalType.If)
                 {
-                    OperationStack.Add(new RPNSymbol(ERPNType.ConditionalJumpToMark));
-                    OperationStack.Add(new RPNSymbol(ERPNType.Mark));
-                    TempMarks.Add(new RPNMark(ERPNType.Mark, EMarkType.IfMark));
+                    OperationStack.Add(new RPNSymbol(ERPNType.F_ConditionalJumpToMark));
+                    OperationStack.Add(new RPNSymbol(ERPNType.М_Mark));
+                    TempMarks.Add(new RPNMark(ERPNType.М_Mark, EMarkType.IfMark));
                     Input.Remove(Input.First());
                 }
                 //else обрабатывается особым образом
@@ -84,7 +84,7 @@ namespace Компилятор
         /// </summary>
         public static bool IsWritableInOperationStack(RPNSymbol input)
         {
-            if ((input.RPNType == ERPNType.Semicolon) || (input.RPNType == ERPNType.RightParen) || (input.RPNType == ERPNType.RightBracket) || (input.RPNType == ERPNType.RightBrace) || (input.RPNType == ERPNType.LeftParen))
+            if ((input.RPNType == ERPNType.T_Semicolon) || (input.RPNType == ERPNType.T_RightParen) || (input.RPNType == ERPNType.T_RightBracket) || (input.RPNType == ERPNType.T_RightBrace) || (input.RPNType == ERPNType.T_LeftParen))
             {
                 return false;
             }
@@ -103,7 +103,7 @@ namespace Компилятор
         /// </summary>
         public static bool IsWritableInOutput(RPNSymbol input)
         {
-            if ((input.RPNType == ERPNType.Semicolon) || (input.RPNType == ERPNType.RightParen) || (input.RPNType == ERPNType.RightBracket) || (input.RPNType == ERPNType.RightBrace) || (input.RPNType == ERPNType.LeftBrace) || (input.RPNType == ERPNType.LeftParen) || (input.RPNType == ERPNType.LeftBracket))
+            if ((input.RPNType == ERPNType.T_Semicolon) || (input.RPNType == ERPNType.T_RightParen) || (input.RPNType == ERPNType.T_RightBracket) || (input.RPNType == ERPNType.T_RightBrace) || (input.RPNType == ERPNType.T_LeftBrace) || (input.RPNType == ERPNType.T_LeftParen) || (input.RPNType == ERPNType.T_LeftBracket))
             {
                 return false;
             }
@@ -136,7 +136,7 @@ namespace Компилятор
         /// </summary>
         public static bool IsVariableInitialization(RPNSymbol input)
         {
-            if ((input.RPNType == ERPNType.Func_Int) || (input.RPNType == ERPNType.Func_String) || (input.RPNType == ERPNType.Func_Bool))
+            if ((input.RPNType == ERPNType.F_Int) || (input.RPNType == ERPNType.F_String) || (input.RPNType == ERPNType.F_Bool))
             {
                 return true;
             }
@@ -151,9 +151,9 @@ namespace Компилятор
             if (OperationStack.Count > 0)
             {
                 //Если входная лексема - правая круглая скобка, то в Output записываются все операции из OperationStack пока там не найдётся левая круглая скобка
-                if ((OperationStack.Count > 0) && (input.RPNType == ERPNType.RightParen))
+                if ((OperationStack.Count > 0) && (input.RPNType == ERPNType.T_RightParen))
                 {
-                    while ((OperationStack.Count > 0) && (OperationStack.Last().RPNType != ERPNType.LeftParen))
+                    while ((OperationStack.Count > 0) && (OperationStack.Last().RPNType != ERPNType.T_LeftParen))
                     {
                         if (IsWritableInOutput(OperationStack.Last()))
                         {
@@ -165,13 +165,13 @@ namespace Компилятор
                     if (OperationStack.Count > 1)
                     {
                         OperationStack.Remove(OperationStack.Last());
-                        if (OperationStack.Last().RPNType == ERPNType.ConditionalJumpToMark)
+                        if (OperationStack.Last().RPNType == ERPNType.F_ConditionalJumpToMark)
                         {
                             if (IsWritableInOutput(OperationStack.Last()))
                                 Output.Add(OperationStack.Last());
                             OperationStack.Remove(OperationStack.Last());
                         }
-                        else if (OperationStack.Last().RPNType == ERPNType.UnconditionalJumpToMark)
+                        else if (OperationStack.Last().RPNType == ERPNType.F_UnconditionalJumpToMark)
                         {
                             if (IsWritableInOutput(OperationStack.Last()))
                                 Output.Add(OperationStack.Last());
@@ -180,10 +180,10 @@ namespace Компилятор
                     }
                 }
 
-                else if ((OperationStack.Count > 0) && (input.RPNType == ERPNType.RightBracket))
+                else if ((OperationStack.Count > 0) && (input.RPNType == ERPNType.T_RightBracket))
                 {
                     //Если входная лексема - правая квадратная скобка, то в Output записываются все операции из OperationStack пока там не найдётся левая квадратная скобка
-                    while ((OperationStack.Count > 0) && (OperationStack.Last().RPNType != ERPNType.LeftBracket))
+                    while ((OperationStack.Count > 0) && (OperationStack.Last().RPNType != ERPNType.T_LeftBracket))
                     {
                         if (IsWritableInOutput(OperationStack.Last()))
                         {
@@ -194,7 +194,7 @@ namespace Компилятор
                     //Если перед левой квадратной скобкой стоит операция инициализации переменной - в Output записывается операция инициализации массива переменных такого типа
                     if ((OperationStack.Count > 1) && IsVariableInitialization(OperationStack.Last()))
                     {
-                        if (OperationStack.Last().RPNType == ERPNType.LeftBracket)
+                        if (OperationStack.Last().RPNType == ERPNType.T_LeftBracket)
                         {
                             OperationStack.Remove(OperationStack.Last());
                         }
@@ -209,15 +209,15 @@ namespace Компилятор
                     //Иначе - в Output записывается операция индексации
                     else if (OperationStack.Count > 0)
                     {
-                        Output.Add(new RPNSymbol(ERPNType.Func_Index));
+                        Output.Add(new RPNSymbol(ERPNType.F_Index));
                         OperationStack.Remove(OperationStack.Last());
                     }
                 }
 
                 //Если входная лексема - правая фигурная скобка, то в Output записываются все операции из OperationStack пока там не найдётся левая фигурная скобка
-                else if ((OperationStack.Count > 0) && (input.RPNType == ERPNType.RightBrace))
+                else if ((OperationStack.Count > 0) && (input.RPNType == ERPNType.T_RightBrace))
                 {
-                    while ((OperationStack.Count > 0) && (OperationStack.Last().RPNType != ERPNType.LeftBrace))
+                    while ((OperationStack.Count > 0) && (OperationStack.Last().RPNType != ERPNType.T_LeftBrace))
                     {
                         if (IsWritableInOutput(OperationStack.Last()))
                         {
@@ -228,9 +228,9 @@ namespace Компилятор
                     //Обработка while
                     if ((TempMarks.Count > 0) && (TempMarks.Last().MarkType == EMarkType.WhileBeginMark))
                     {
-                        TempMarks.Add(new RPNMark(ERPNType.Mark, EMarkType.WhileEndMark));
-                        Output.Add(new RPNSymbol(ERPNType.Mark));
-                        Output.Add(new RPNSymbol(ERPNType.UnconditionalJumpToMark));
+                        TempMarks.Add(new RPNMark(ERPNType.М_Mark, EMarkType.WhileEndMark));
+                        Output.Add(new RPNSymbol(ERPNType.М_Mark));
+                        Output.Add(new RPNSymbol(ERPNType.F_UnconditionalJumpToMark));
                         TempMarks.Last().Position = Output.Count();
                         TempMarks[TempMarks.Count-2].Position = TempMarks[TempMarks.Count - 2].Position;
                         ConstMarks.Add(TempMarks.Last());
@@ -251,9 +251,9 @@ namespace Компилятор
                             {
                                 ConstMarks[i].Position += 2;
                             }
-                            Output.Add(new RPNMark(ERPNType.Mark, EMarkType.ElseMark));
-                            TempMarks.Add(new RPNMark(ERPNType.Mark, EMarkType.ElseMark));
-                            Output.Add(new RPNSymbol(ERPNType.UnconditionalJumpToMark));
+                            Output.Add(new RPNMark(ERPNType.М_Mark, EMarkType.ElseMark));
+                            TempMarks.Add(new RPNMark(ERPNType.М_Mark, EMarkType.ElseMark));
+                            Output.Add(new RPNSymbol(ERPNType.F_UnconditionalJumpToMark));
                         }
                     }
                     else if ((TempMarks.Count > 0) && (TempMarks.Last().MarkType == EMarkType.ElseMark))
@@ -286,36 +286,36 @@ namespace Компилятор
         /// </summary>
         public static RPNSymbol TranslateToRPNSymbol(Terminal input) => input.TerminalType switch
         {
-            ETerminalType.Assignment => new RPNSymbol(ERPNType.FuncAssignment),
-            ETerminalType.And => new RPNSymbol(ERPNType.FuncAnd),
-            ETerminalType.Or => new RPNSymbol(ERPNType.FuncOr),
-            ETerminalType.Equal => new RPNSymbol(ERPNType.FuncEqual),
-            ETerminalType.Less => new RPNSymbol(ERPNType.FuncLess),
-            ETerminalType.Greater => new RPNSymbol(ERPNType.FuncGreater),
-            ETerminalType.LessEqual => new RPNSymbol(ERPNType.FuncLessEqual),
-            ETerminalType.GreaterEqual => new RPNSymbol(ERPNType.FuncGreaterEqual),
-            ETerminalType.Plus => new RPNSymbol(ERPNType.FuncPlus),
-            ETerminalType.Minus => new RPNSymbol(ERPNType.FuncMinus),
-            ETerminalType.Multiply => new RPNSymbol(ERPNType.FuncMultiply),
-            ETerminalType.Divide => new RPNSymbol(ERPNType.FuncDivide),
-            ETerminalType.Modulus => new RPNSymbol(ERPNType.FuncModulus),
-            ETerminalType.Not => new RPNSymbol(ERPNType.FuncNot),
-            ETerminalType.Int => new RPNSymbol(ERPNType.FuncInt),
-            ETerminalType.String => new RPNSymbol(ERPNType.FuncString),
-            ETerminalType.Bool => new RPNSymbol(ERPNType.FuncBool),
-            ETerminalType.Input => new RPNSymbol(ERPNType.FuncInput),
-            ETerminalType.Output => new RPNSymbol(ERPNType.FuncOutput),
-            ETerminalType.LeftBracket => new RPNSymbol(ERPNType.LeftBracket),
-            ETerminalType.RightBracket => new RPNSymbol(ERPNType.RightBracket),
-            ETerminalType.LeftParen => new RPNSymbol(ERPNType.LeftParen),
-            ETerminalType.RightParen => new RPNSymbol(ERPNType.RightParen),
-            ETerminalType.LeftBrace => new RPNSymbol(ERPNType.LeftBrace),
-            ETerminalType.RightBrace => new RPNSymbol(ERPNType.RightBrace),
-            ETerminalType.Identifier => new RPNSymbol(ERPNType.Identifier),
-            ETerminalType.Number => new RPNSymbol(ERPNType.Number),
-            ETerminalType.TextLine => new RPNSymbol(ERPNType.TextLine),
-            ETerminalType.Boolean => new RPNSymbol(ERPNType.Boolean),
-            ETerminalType.Semicolon => new RPNSymbol(ERPNType.Semicolon),
+            ETerminalType.Assignment => new RPNSymbol(ERPNType.F_Assignment),
+            ETerminalType.And => new RPNSymbol(ERPNType.F_And),
+            ETerminalType.Or => new RPNSymbol(ERPNType.F_Or),
+            ETerminalType.Equal => new RPNSymbol(ERPNType.F_Equal),
+            ETerminalType.Less => new RPNSymbol(ERPNType.F_Less),
+            ETerminalType.Greater => new RPNSymbol(ERPNType.F_Greater),
+            ETerminalType.LessEqual => new RPNSymbol(ERPNType.F_LessEqual),
+            ETerminalType.GreaterEqual => new RPNSymbol(ERPNType.F_GreaterEqual),
+            ETerminalType.Plus => new RPNSymbol(ERPNType.F_Plus),
+            ETerminalType.Minus => new RPNSymbol(ERPNType.F_Minus),
+            ETerminalType.Multiply => new RPNSymbol(ERPNType.F_Multiply),
+            ETerminalType.Divide => new RPNSymbol(ERPNType.F_Divide),
+            ETerminalType.Modulus => new RPNSymbol(ERPNType.F_Modulus),
+            ETerminalType.Not => new RPNSymbol(ERPNType.F_Not),
+            ETerminalType.Int => new RPNSymbol(ERPNType.F_Int),
+            ETerminalType.String => new RPNSymbol(ERPNType.F_String),
+            ETerminalType.Bool => new RPNSymbol(ERPNType.F_Bool),
+            ETerminalType.Input => new RPNSymbol(ERPNType.F_Input),
+            ETerminalType.Output => new RPNSymbol(ERPNType.F_Output),
+            ETerminalType.LeftBracket => new RPNSymbol(ERPNType.T_LeftBracket),
+            ETerminalType.RightBracket => new RPNSymbol(ERPNType.T_RightBracket),
+            ETerminalType.LeftParen => new RPNSymbol(ERPNType.T_LeftParen),
+            ETerminalType.RightParen => new RPNSymbol(ERPNType.T_RightParen),
+            ETerminalType.LeftBrace => new RPNSymbol(ERPNType.T_LeftBrace),
+            ETerminalType.RightBrace => new RPNSymbol(ERPNType.T_RightBrace),
+            ETerminalType.VariableName => new RPNSymbol(ERPNType.A_VariableName),
+            ETerminalType.Number => new RPNSymbol(ERPNType.A_Number),
+            ETerminalType.TextLine => new RPNSymbol(ERPNType.A_TextLine),
+            ETerminalType.Boolean => new RPNSymbol(ERPNType.A_Boolean),
+            ETerminalType.Semicolon => new RPNSymbol(ERPNType.T_Semicolon),
 
             //ETerminalType.If => new RPNSymbol(ERPNType.ConditionalJumpToMark),
             //ETerminalType.Else => new RPNSymbol(ERPNType.UnconditionalJumpToMark),
@@ -327,36 +327,36 @@ namespace Компилятор
         /// </summary>
         public static int GetRPNSymbolPriority(RPNSymbol input) => input.RPNType switch
         {
-            ERPNType.Semicolon => -1,
-            ERPNType.LeftParen => -1,
-            ERPNType.LeftBrace => -1,
-            ERPNType.LeftBracket => -1,
-            ERPNType.ConditionalJumpToMark => -1,
-            ERPNType.UnconditionalJumpToMark => -1,
-            ERPNType.Mark => -1,
-            ERPNType.FuncAssignment => 0,
-            ERPNType.FuncAnd => 1,
-            ERPNType.FuncOr => 1,
-            ERPNType.FuncEqual => 2,
-            ERPNType.FuncLess => 2,
-            ERPNType.FuncGreater => 2,
-            ERPNType.FuncLessEqual => 2,
-            ERPNType.FuncGreaterEqual => 2,
-            ERPNType.FuncPlus => 3,
-            ERPNType.FuncMinus => 3,
-            ERPNType.FuncMultiply => 4,
-            ERPNType.FuncDivide => 4,
-            ERPNType.FuncModulus => 4,
-            ERPNType.FuncNot => 5,
-            ERPNType.FuncInt => 6,
-            ERPNType.FuncString => 6,
-            ERPNType.FuncBool => 6,
-            ERPNType.FuncIntArray => 6,
-            ERPNType.FuncStringArray => 6,
-            ERPNType.FuncBoolArray => 6,
-            ERPNType.FuncInput => 7,
-            ERPNType.FuncOutput => 7,
-            ERPNType.FuncIndex => 8,
+            ERPNType.T_Semicolon => -1,
+            ERPNType.T_LeftParen => -1,
+            ERPNType.T_LeftBrace => -1,
+            ERPNType.T_LeftBracket => -1,
+            ERPNType.F_ConditionalJumpToMark => -1,
+            ERPNType.F_UnconditionalJumpToMark => -1,
+            ERPNType.М_Mark => -1,
+            ERPNType.F_Assignment => 0,
+            ERPNType.F_And => 1,
+            ERPNType.F_Or => 1,
+            ERPNType.F_Equal => 2,
+            ERPNType.F_Less => 2,
+            ERPNType.F_Greater => 2,
+            ERPNType.F_LessEqual => 2,
+            ERPNType.F_GreaterEqual => 2,
+            ERPNType.F_Plus => 3,
+            ERPNType.F_Minus => 3,
+            ERPNType.F_Multiply => 4,
+            ERPNType.F_Divide => 4,
+            ERPNType.F_Modulus => 4,
+            ERPNType.F_Not => 5,
+            ERPNType.F_Int => 6,
+            ERPNType.F_String => 6,
+            ERPNType.F_Bool => 6,
+            ERPNType.F_IntArray => 6,
+            ERPNType.F_StringArray => 6,
+            ERPNType.F_BoolArray => 6,
+            ERPNType.F_Input => 7,
+            ERPNType.F_Output => 7,
+            ERPNType.F_Index => 8,
             _ => throw new NotImplementedException("КРАШНУТЬСЯ НАФИГ НО ПОНИЖЕ")
         };
         /// <summary>
@@ -364,9 +364,9 @@ namespace Компилятор
         /// </summary>
         public static ERPNType ToArrayInit(RPNSymbol input) => input.RPNType switch
         {
-            ERPNType.Func_Int => ERPNType.Func_IntArray,
-            ERPNType.Func_String => ERPNType.Func_StringArray,
-            ERPNType.Func_Bool => ERPNType.Func_BoolArray,
+            ERPNType.F_Int => ERPNType.F_IntArray,
+            ERPNType.F_String => ERPNType.F_StringArray,
+            ERPNType.F_Bool => ERPNType.F_BoolArray,
             _ => throw new NotImplementedException("КРАШНУТЬСЯ НАФИГ НО ЕЩЁ НИЖЕ")
         };
     }
