@@ -14,4 +14,15 @@ namespace Компилятор
             RPNType = type;
         }
     }
+    public class RPNMark : RPNSymbol
+    {
+        public RPNMark(ERPNType type, EMarkType markType)
+            : base(type)
+        {
+            RPNType = type;
+            MarkType = markType;
+        }
+        public int? Position { get; set; }
+        public EMarkType MarkType { get; set; }
+    }
 }
