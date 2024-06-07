@@ -270,7 +270,7 @@
                 if (terminals.ElementAtOrDefault(leftParenIndex)?.TerminalType == ETerminalType.LeftParen)
                 {
                     // находим индекс парной )
-                    int rightParenIndex = +FindPairedClosingBracket(leftParenIndex, terminals);
+                    int rightParenIndex = FindPairedClosingBracket(leftParenIndex, terminals);
                     // если парная ) успешно нашлась
                     if (rightParenIndex != -1)
                     {
@@ -278,7 +278,7 @@
                         int semicolonIndex = rightParenIndex + 1;
 
                         // если по индексу действительно ;
-                        if (terminals.ElementAtOrDefault(leftParenIndex)?.TerminalType == ETerminalType.Semicolon)
+                        if (terminals.ElementAtOrDefault(semicolonIndex)?.TerminalType == ETerminalType.Semicolon)
                         {
                             // выделяем подпоследовательности для парсинга
                             var partForIdentifier = terminals[(leftParenIndex + 1)..rightParenIndex];
@@ -311,7 +311,7 @@
                 if (terminals.ElementAtOrDefault(leftParenIndex)?.TerminalType == ETerminalType.LeftParen)
                 {
                     // находим индекс парной )
-                    int rightParenIndex = +FindPairedClosingBracket(leftParenIndex, terminals);
+                    int rightParenIndex = FindPairedClosingBracket(leftParenIndex, terminals);
                     // если парная ) успешно нашлась
                     if (rightParenIndex != -1)
                     {
@@ -319,7 +319,7 @@
                         int semicolonIndex = rightParenIndex + 1;
 
                         // если по индексу действительно ;
-                        if (terminals.ElementAtOrDefault(leftParenIndex)?.TerminalType == ETerminalType.Semicolon)
+                        if (terminals.ElementAtOrDefault(semicolonIndex)?.TerminalType == ETerminalType.Semicolon)
                         {
                             // выделяем подпоследовательности для парсинга
                             var partForIdentifier = terminals[(leftParenIndex + 1)..rightParenIndex];
@@ -580,7 +580,7 @@
                     if (terminals.ElementAtOrDefault(leftParenIndex)?.TerminalType == ETerminalType.LeftParen)
                     {
                         // находим индекс парной )
-                        int rightParenIndex = +FindPairedClosingBracket(leftParenIndex, terminals);
+                        int rightParenIndex = FindPairedClosingBracket(leftParenIndex, terminals);
                         // если парная ) успешно нашлась
                         if (rightParenIndex != -1)
                         {
@@ -588,7 +588,7 @@
                             int semicolonIndex = rightParenIndex + 1;
 
                             // если по индексу действительно ;
-                            if (terminals.ElementAtOrDefault(leftParenIndex)?.TerminalType == ETerminalType.Semicolon)
+                            if (terminals.ElementAtOrDefault(semicolonIndex)?.TerminalType == ETerminalType.Semicolon)
                             {
                                 // выделяем подпоследовательности для парсинга
                                 var partForIdentifier = terminals[(leftParenIndex + 1)..rightParenIndex];
@@ -621,7 +621,7 @@
                     if (terminals.ElementAtOrDefault(leftParenIndex)?.TerminalType == ETerminalType.LeftParen)
                     {
                         // находим индекс парной )
-                        int rightParenIndex = +FindPairedClosingBracket(leftParenIndex, terminals);
+                        int rightParenIndex = FindPairedClosingBracket(leftParenIndex, terminals);
                         // если парная ) успешно нашлась
                         if (rightParenIndex != -1)
                         {
@@ -629,7 +629,7 @@
                             int semicolonIndex = rightParenIndex + 1;
 
                             // если по индексу действительно ;
-                            if (terminals.ElementAtOrDefault(leftParenIndex)?.TerminalType == ETerminalType.Semicolon)
+                            if (terminals.ElementAtOrDefault(semicolonIndex)?.TerminalType == ETerminalType.Semicolon)
                             {
                                 // выделяем подпоследовательности для парсинга
                                 var partForIdentifier = terminals[(leftParenIndex + 1)..rightParenIndex];
