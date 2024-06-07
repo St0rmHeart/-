@@ -69,7 +69,7 @@ namespace Компилятор
             RPNInput.Add(new Terminal(ETerminalType.RightBrace));
             *//*
             //if (a >= 5) { a = a - 2 } else { a = 2 % 2 }
-            *//*
+            
             RPNInput.Add(new Terminal(ETerminalType.If));
             RPNInput.Add(new Terminal(ETerminalType.LeftParen));
             RPNInput.Add(new Terminal(ETerminalType.VariableName));
@@ -91,7 +91,7 @@ namespace Компилятор
             RPNInput.Add(new Terminal(ETerminalType.Modulus));
             RPNInput.Add(new Terminal(ETerminalType.Number));
             RPNInput.Add(new Terminal(ETerminalType.RightBrace));
-            *//*
+            
             // while (a>b) { a = a - 1 }
             *//*
             RPNInput.Add(new Terminal(ETerminalType.While));
@@ -143,6 +143,7 @@ namespace Компилятор
             RPNInput.Add(new Terminal(ETerminalType.Semicolon));
             *//*
             //((a+2)-(b+3))*6
+            /*
             RPNInput.Add(new Terminal(ETerminalType.LeftParen));
             RPNInput.Add(new Terminal(ETerminalType.LeftParen));
             RPNInput.Add(new Terminal(ETerminalType.VariableName));
@@ -158,13 +159,22 @@ namespace Компилятор
             RPNInput.Add(new Terminal(ETerminalType.RightParen));
             RPNInput.Add(new Terminal(ETerminalType.Multiply));
             RPNInput.Add(new Terminal(ETerminalType.Number));
-            RPNTranslator translator = new RPNTranslator();
-            var RPNOutput = translator.Translate(RPNInput);
+            */
+            var RPNOutput = RPNTranslator.Translate(RPNInput);
             for (int i = 0; i < RPNOutput.Count; i++)
             {
                 Console.WriteLine(RPNOutput[i].RPNType.ToString());
             }*/
             #endregion
+            var code = FileReader.Read("data.txt");
+            var lexicalAnalizatorResult = LexicalAnalyzer.IsLexicalCorrect(code);
+            List<Terminal> terminals = [];
+            if (lexicalAnalizatorResult.IsCorrect)
+            {
+                terminals = lexicalAnalizatorResult.Terminals;
+            }
+            #endregion
+            /*
             var code = FileReader.Read("data.txt");
             var lexicalAnalizatorResult = LexicalAnalyzer.IsLexicalCorrect(code);
             List<Terminal> terminals = [];
@@ -183,6 +193,7 @@ namespace Компилятор
             {
                 Console.WriteLine(rpn[i].RPNType.ToString());
             }
+            */
         }
     }
 }
