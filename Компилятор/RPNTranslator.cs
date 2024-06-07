@@ -24,6 +24,7 @@ namespace Компилятор
             Input = input;
             while (Input.Count > 0)
             {
+                // если любая левая скобка 
                 if (IsOpeningParenthesis(Input[0]))
                 {
                     OperationStack.Add(TranslateToRPNSymbol(Input[0]));

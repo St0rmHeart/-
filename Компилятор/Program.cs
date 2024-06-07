@@ -28,7 +28,7 @@ namespace Компилятор
             int i = 0;
             foreach (var rpnsymvol in rpn)
             {
-                Console.Write(i++.ToString() + " " + rpnsymvol.RPNType);
+                Console.Write($"{i++,3} {rpnsymvol.RPNType}");
                 if (rpnsymvol is RPNMark)
                 {
                     var r = rpnsymvol as RPNMark;
