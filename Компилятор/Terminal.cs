@@ -42,7 +42,7 @@
             public string Name { get; }
             public Identifier(ETerminalType type, string name) : base(type)
             {
-                if (type != ETerminalType.Identifier) throw new ArgumentException("Неверно создан нетерминал");
+                if (type != ETerminalType.VariableName) throw new ArgumentException("Неверно создан нетерминал");
                 Name = name;
             }
         }

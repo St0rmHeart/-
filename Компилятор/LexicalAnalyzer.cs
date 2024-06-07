@@ -24,7 +24,7 @@
                 case ETerminalType.Boolean:
                     Terminals.Add(new Terminal.Boolean(terminalType, value));
                     break;
-                case ETerminalType.Identifier:
+                case ETerminalType.VariableName:
                     Terminals.Add(new Terminal.Identifier(terminalType, value));
                     break;
                 default:
@@ -248,7 +248,7 @@
                     break;
 
                 default:
-                    ReadTerminal(ETerminalType.Identifier, identifier);
+                    ReadTerminal(ETerminalType.VariableName, identifier);
                     break;
             }
 

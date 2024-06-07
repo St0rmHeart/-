@@ -105,9 +105,9 @@
         // Identifiers and keywords
        
         /// <summary>
-        /// Пользовательский идентификатор
+        /// Пользовательская переменная
         /// </summary>
-        Identifier,   // a...z, A...Z, _, а...я, А...Я
+        VariableName,   // a...z, A...Z, _, а...я, А...Я
         
         /// <summary>
         /// if
