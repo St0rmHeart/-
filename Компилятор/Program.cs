@@ -22,10 +22,18 @@ namespace Компилятор
             {
                 throw new Exception();
             }
+            int i = 0;
             foreach (var rpnsymvol in rpn)
             {
-                Console.WriteLine(rpnsymvol.RPNType);
+                Console.Write(i++.ToString() + " " + rpnsymvol.RPNType);
+                if (rpnsymvol is RPNMark)
+                {
+                    var r = rpnsymvol as RPNMark;
+                    Console.Write(" " + r.Position.ToString());
+                }
+                Console.WriteLine();
             }
+
         }
     }
 }
