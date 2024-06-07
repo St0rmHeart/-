@@ -45,7 +45,7 @@ namespace Компилятор
                 else if (Input[0].TerminalType == ETerminalType.While)
                 {
                     OperationStack.Add(new RPNSymbol(ERPNType.F_ConditionalJumpToMark));
-                    OperationStack.Add(new RPNSymbol(ERPNType.М_Mark));
+                    OperationStack.Add(new RPNMark(ERPNType.М_Mark, EMarkType.WhileBeginMark));
                     TempMarks.Add(new RPNMark(ERPNType.М_Mark, EMarkType.WhileBeginMark));
                     TempMarks.Last().Position = Output.Count;
                     Input.Remove(Input.First());
@@ -54,17 +54,13 @@ namespace Компилятор
                 else if (Input[0].TerminalType == ETerminalType.If)
                 {
                     OperationStack.Add(new RPNSymbol(ERPNType.F_ConditionalJumpToMark));
-                    OperationStack.Add(new RPNSymbol(ERPNType.М_Mark));
+                    OperationStack.Add(new RPNMark(ERPNType.М_Mark,EMarkType.IfMark));
                     TempMarks.Add(new RPNMark(ERPNType.М_Mark, EMarkType.IfMark));
                     Input.Remove(Input.First());
                 }
                 //else обрабатывается особым образом
                 else if (Input[0].TerminalType == ETerminalType.Else)
                 {
-                    //OperationStack.Add(new RPNSymbol(ERPNType.UnconditionalJumpToMark));
-                    //OperationStack.Add(new RPNSymbol(ERPNType.Mark));
-                    //TempMarks.Add(new RPNMark(ERPNType.Mark, EMarkType.ElseMark));
-                    //ConstMarks.Add(new RPNMark(ERPNType.Mark, EMarkType.ElseMark));
                     Input.Remove(Input.First());
                 }
             }
@@ -77,7 +73,27 @@ namespace Компилятор
                 }
                 OperationStack.Remove(OperationStack.Last());
             }
+            WriteMarks();
             return Output;
+        }
+        public static void WriteMarks()
+        {
+            for (int i = 0; i < Output.Count; i++)
+            {
+                if (Output[i] is RPNMark)
+                {
+                    if (ConstMarks.Count > 0)
+                    {
+                        var ou = Output[i] as RPNMark;
+                        ou.Position = ConstMarks[0].Position;
+                        ConstMarks.Remove(ConstMarks[0]);
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+            }
         }
         /// <summary>
         /// Возвращает true если input можно записать в OperationStack
@@ -165,14 +181,11 @@ namespace Компилятор
                     if (OperationStack.Count > 1)
                     {
                         OperationStack.Remove(OperationStack.Last());
-                        if (OperationStack.Last().RPNType == ERPNType.F_ConditionalJumpToMark)
+                        if (OperationStack.Last().RPNType == ERPNType.М_Mark)
                         {
                             if (IsWritableInOutput(OperationStack.Last()))
                                 Output.Add(OperationStack.Last());
                             OperationStack.Remove(OperationStack.Last());
-                        }
-                        else if (OperationStack.Last().RPNType == ERPNType.F_UnconditionalJumpToMark)
-                        {
                             if (IsWritableInOutput(OperationStack.Last()))
                                 Output.Add(OperationStack.Last());
                             OperationStack.Remove(OperationStack.Last());
@@ -192,7 +205,7 @@ namespace Компилятор
                         OperationStack.Remove(OperationStack.Last());
                     }
                     //Если перед левой квадратной скобкой стоит операция инициализации переменной - в Output записывается операция инициализации массива переменных такого типа
-                    if ((OperationStack.Count > 1) && IsVariableInitialization(OperationStack.Last()))
+                    if ((OperationStack.Count > 1) && IsVariableInitialization(OperationStack[OperationStack.Count-2]))
                     {
                         if (OperationStack.Last().RPNType == ERPNType.T_LeftBracket)
                         {
@@ -200,11 +213,11 @@ namespace Компилятор
                         }
                         if (IsVariableInitialization(OperationStack.Last()))
                         {
-                            //Output.Add(TranslateToRPNSymbol(Input[1]));
-                            //Input.Remove(Input[1]);
+                            Output.Add(TranslateToRPNSymbol(Input[1]));
+                            Input.Remove(Input[1]);
                             Output.Add(new RPNSymbol(ToArrayInit(OperationStack.Last())));
                         }
-                        //OperationStack.Remove(OperationStack.Last());
+                        OperationStack.Remove(OperationStack.Last());
                     }
                     //Иначе - в Output записывается операция индексации
                     else if (OperationStack.Count > 0)
@@ -229,13 +242,13 @@ namespace Компилятор
                     if ((TempMarks.Count > 0) && (TempMarks.Last().MarkType == EMarkType.WhileBeginMark))
                     {
                         TempMarks.Add(new RPNMark(ERPNType.М_Mark, EMarkType.WhileEndMark));
-                        Output.Add(new RPNSymbol(ERPNType.М_Mark));
+                        Output.Add(new RPNMark(ERPNType.М_Mark, EMarkType.WhileEndMark));
                         Output.Add(new RPNSymbol(ERPNType.F_UnconditionalJumpToMark));
-                        TempMarks.Last().Position = Output.Count();
-                        TempMarks[TempMarks.Count-2].Position = TempMarks[TempMarks.Count - 2].Position;
+                        TempMarks.Last().Position = Output.Count;
+                        //TempMarks[TempMarks.Count-2].Position = TempMarks[TempMarks.Count - 2].Position;
                         ConstMarks.Add(TempMarks.Last());
+                        ConstMarks.Add(TempMarks[TempMarks.Count-2]);
                         TempMarks.Remove(TempMarks.Last());
-                        ConstMarks.Add(TempMarks.Last());
                         TempMarks.Remove(TempMarks.Last());
                     }
                     //Обработка if
@@ -247,10 +260,7 @@ namespace Компилятор
 
                         if ((Input.Count() > 1) && (Input[1].TerminalType == ETerminalType.Else))
                         {
-                            for (int i = 0; i < ConstMarks.Count; i++)
-                            {
-                                ConstMarks[i].Position += 2;
-                            }
+                            ConstMarks.Last().Position += 2;
                             Output.Add(new RPNMark(ERPNType.М_Mark, EMarkType.ElseMark));
                             TempMarks.Add(new RPNMark(ERPNType.М_Mark, EMarkType.ElseMark));
                             Output.Add(new RPNSymbol(ERPNType.F_UnconditionalJumpToMark));
