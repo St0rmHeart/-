@@ -429,7 +429,7 @@
                                                 var partForLogicalOR = terminals[(leftParenIndex + 1)..rightParenIndex];
                                                 var partForFirstInstructionBlock = terminals[(firstLeftBraceIndex + 1)..firstRightBraceIndex];
                                                 var partForSecondInstructionBlock = terminals[(secondLeftBraceIndex + 1)..secondRightBraceIndex];
-                                                var partForFollowingInstruction = terminals[(firstRightBraceIndex + 1)..];
+                                                var partForFollowingInstruction = terminals[(secondRightBraceIndex + 1)..];
                                                 // Если подподпоследоватльности терминалов прошли парсинг
                                                 if (ParseLogicalOR(partForLogicalOR) &&
                                                     ParseInstructionBlock(partForFirstInstructionBlock) &&
