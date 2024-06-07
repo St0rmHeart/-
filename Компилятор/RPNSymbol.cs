@@ -13,6 +13,8 @@ namespace Компилятор
         {
             RPNType = type;
         }
+        public int CharPointer { get; set; }
+        public int LinePointer { get; set; }
     }
     public class RPNMark : RPNSymbol
     {
@@ -32,8 +34,6 @@ namespace Компилятор
         {
             RPNType = type;
         }
-        public int CharPointer { get; set; }
-        public int LinePointer { get; set; }
         public string Data { get; set; }
     }
     public class RPNNumber : RPNSymbol
@@ -43,8 +43,6 @@ namespace Компилятор
         {
             RPNType = type;
         }
-        public int CharPointer { get; set; }
-        public int LinePointer { get; set; }
         public int Data { get; set; }
     }
     public class RPNBoolean : RPNSymbol
@@ -54,8 +52,6 @@ namespace Компилятор
         {
             RPNType = type;
         }
-        public int CharPointer { get; set; }
-        public int LinePointer { get; set; }
         public bool Data { get; set; }
     }
     public class RPNIdentifier : RPNSymbol
@@ -65,8 +61,6 @@ namespace Компилятор
         {
             RPNType = type;
         }
-        public int CharPointer { get; set; }
-        public int LinePointer { get; set; }
         public string Name { get; set; }
     }
 }

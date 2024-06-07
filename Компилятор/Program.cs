@@ -36,7 +36,6 @@ namespace Компилятор
                 }
                 Console.WriteLine();
             }
-
         }
     }
 }
