@@ -380,41 +380,23 @@
         /// <summary>
         /// Если TRUE - выполняется идущий дальше код, иначе - переход к MarkIf
         /// </summary>
-        ConditionalJumpToMarkIf,
+        ConditionalJumpToMark,
 
         /// <summary>
         /// Безусловный переход к MarkElse
         /// </summary>
-        JumpToMarkElse, 
+        UnconditionalJumpToMark,
 
         /// <summary>
-        /// Сюда переходит ConditionalJumpToMarkIf если условие не выполняется
+        /// Безусловный переход к MarkElse
         /// </summary>
-        MarkIf,
-
-        /// <summary>
-        /// Сюда переходит прыгает JumpToMarkElse
-        /// </summary>
-        MarkElse,
-
-        /// <summary>
-        /// Начало цикла While, сюда безусловно переходит ConditionalJumpToWhileEnd 
-        /// </summary>
-        MarkWhileBegin,
-
-        /// <summary>
-        /// Безусловный переход к MarkWhileBegin
-        /// </summary>
-        JumpToWhileBegin,
-
-        /// <summary>
-        /// Конец цикла While, сюда переходит ConditionalJumpToWhileEnd если его условие выполняется
-        /// </summary>
-        MarkWhileEnd,
-
-        /// <summary>
-        /// Если TRUE - выполняется идущий дальше код, иначе - переход к MarkWhileEnd
-        /// </summary>
-        ConditionalJumpToWhileEnd,
+        Mark,
+    }
+    public enum EMarkType
+    {
+        WhileBeginMark,
+        WhileEndMark,
+        IfMark,
+        ElseMark,
     }
 }
