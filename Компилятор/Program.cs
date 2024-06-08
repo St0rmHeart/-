@@ -36,6 +36,7 @@ namespace Компилятор
                 }
                 Console.WriteLine();
             }
+            RPNInterpreter.ExecuteInstructions(rpn);
         }
     }
 }
