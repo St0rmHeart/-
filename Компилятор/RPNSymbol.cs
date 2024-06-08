@@ -24,8 +24,9 @@ namespace Компилятор
             RPNType = type;
             MarkType = markType;
         }
-        public int? Position { get; set; }
+        public bool IsFinal { get; set; } = false;
         public EMarkType MarkType { get; set; }
+        public int? Position { get; set; }
     }
     public class RPNTextLine : RPNSymbol
     {

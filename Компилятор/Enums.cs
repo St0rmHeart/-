@@ -201,7 +201,7 @@
         /// <summary>
         /// a=b
         /// </summary>
-        F_Assignment,        // =
+        F_Assignment,    // =
 
         /// <summary>
         /// A&&B
