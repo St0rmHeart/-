@@ -616,6 +616,191 @@ namespace Компилятор
                                     }
                                 }
                             }
+
+                            //Операция умножения
+                            else if (symbol.RPNType == ERPNType.F_Multiply)
+                            {
+                                if (stack.Peek() is RPNIdentifier)
+                                {
+                                    string var2 = (stack.Pop() as RPNIdentifier).Name;
+
+                                    if (stack.Peek() is RPNIdentifier)
+                                    {
+                                        string var1 = (stack.Pop() as RPNIdentifier).Name;
+
+                                        if (!variables.ContainsKey(var1) || !variables.ContainsKey(var2))
+                                        {
+                                            throw new Exception("Обращение к несуществующей переменной!");
+                                        }
+
+                                        if (variables[var1][0] != ERPNType.A_Number.ToString() || variables[var2][0] != ERPNType.A_Number.ToString())
+                                        {
+                                            throw new Exception("Несоответствие типов");
+                                        }
+
+                                        if (variables[var1][0] == ERPNType.A_Number.ToString())
+                                        {
+                                            RPNNumber rPNNumber = new RPNNumber(ERPNType.A_Number);
+                                            rPNNumber.Data = int.Parse(variables[var1][1]) * int.Parse(variables[var2][1]);
+                                            stack.Push(rPNNumber);
+                                        }
+                                        else
+                                        {
+                                            throw new Exception("Неверный тип аргументов");
+                                        }
+                                    }
+                                    else if (stack.Peek() is RPNNumber)
+                                    {
+                                        string number = (stack.Pop() as RPNNumber).Data.ToString();
+
+                                        if (!variables.ContainsKey(var2))
+                                        {
+                                            throw new Exception("Обращение к несуществующей переменной!");
+                                        }
+
+                                        if (variables[var2][0] != ERPNType.A_Number.ToString())
+                                        {
+                                            throw new Exception("Несоответствие типов");
+                                        }
+
+                                        RPNNumber rPNNumber = new RPNNumber(ERPNType.A_Number);
+                                        rPNNumber.Data = int.Parse(variables[var2][1]) * int.Parse(number);
+                                        stack.Push(rPNNumber);
+                                    }
+                                    else
+                                    {
+                                        throw new Exception("Неверный тип аргументов");
+                                    }
+                                }
+                                else if (stack.Peek() is RPNNumber)
+                                {
+                                    string number = (stack.Pop() as RPNNumber).Data.ToString();
+
+                                    if (stack.Peek() is RPNIdentifier)
+                                    {
+                                        string var = (stack.Pop() as RPNIdentifier).Name;
+
+                                       if (!variables.ContainsKey(var))
+                                        {
+                                            throw new Exception("Обращение к несуществующей переменной!");
+                                        }
+
+                                        if (variables[var][0] != ERPNType.A_Number.ToString())
+                                        {
+                                            throw new Exception("Несоответствие типов");
+                                        }
+
+                                        RPNNumber rPNNumber = new RPNNumber(ERPNType.A_Number);
+                                        rPNNumber.Data = int.Parse(variables[var][1]) * int.Parse(number);
+                                        stack.Push(rPNNumber);
+
+                                    }
+                                    else if (stack.Peek() is RPNNumber)
+                                    {
+                                        string number2 = (stack.Pop() as RPNNumber).Data.ToString();
+
+                                        RPNNumber rPNNumber = new RPNNumber(ERPNType.A_Number);
+                                        rPNNumber.Data = int.Parse(number) * int.Parse(number2);
+                                        stack.Push(rPNNumber);
+                                    }
+                                    else
+                                    {
+                                        throw new Exception("Неверный тип аргументов");
+                                    }
+                                }
+                            }
+
+                            // Операция деления
+                            else if (symbol.RPNType == ERPNType.F_Divide)
+                            {
+                                if (stack.Peek() is RPNIdentifier)
+                                {
+                                    string var2 = (stack.Pop() as RPNIdentifier).Name;
+
+                                    if (stack.Peek() is RPNIdentifier)
+                                    {
+                                        string var1 = (stack.Pop() as RPNIdentifier).Name;
+
+                                        if (!variables.ContainsKey(var1) || !variables.ContainsKey(var2))
+                                        {
+                                            throw new Exception("Обращение к несуществующей переменной!");
+                                        }
+
+                                        if (variables[var1][0] != ERPNType.A_Number.ToString() || variables[var2][0] != ERPNType.A_Number.ToString())
+                                        {
+                                            throw new Exception("Несоответствие типов");
+                                        }
+
+                                        if (variables[var1][0] == ERPNType.A_Number.ToString())
+                                        {
+                                            RPNNumber rPNNumber = new RPNNumber(ERPNType.A_Number);
+                                            rPNNumber.Data = int.Parse(variables[var1][1]) / int.Parse(variables[var2][1]);
+                                            stack.Push(rPNNumber);
+                                        }
+                                        else
+                                        {
+                                            throw new Exception("Неверный тип аргументов");
+                                        }
+                                    }
+                                    else if (stack.Peek() is RPNNumber)
+                                    {
+                                        string number = (stack.Pop() as RPNNumber).Data.ToString();
+
+                                        if (!variables.ContainsKey(var2))
+                                        {
+                                            throw new Exception("Обращение к несуществующей переменной!");
+                                        }
+
+                                        if (variables[var2][0] != ERPNType.A_Number.ToString())
+                                        {
+                                            throw new Exception("Несоответствие типов");
+                                        }
+
+                                        RPNNumber rPNNumber = new RPNNumber(ERPNType.A_Number);
+                                        rPNNumber.Data = int.Parse(number) / int.Parse(variables[var2][1]);
+                                        stack.Push(rPNNumber);
+                                    }
+                                    else
+                                    {
+                                        throw new Exception("Неверный тип аргументов");
+                                    }
+                                }
+                                else if (stack.Peek() is RPNNumber)
+                                {
+                                    string number = (stack.Pop() as RPNNumber).Data.ToString();
+
+                                    if (stack.Peek() is RPNIdentifier)
+                                    {
+                                        string var = (stack.Pop() as RPNIdentifier).Name;
+
+                                        if (!variables.ContainsKey(var))
+                                        {
+                                            throw new Exception("Обращение к несуществующей переменной!");
+                                        }
+
+                                        if (variables[var][0] != ERPNType.A_Number.ToString())
+                                        {
+                                            throw new Exception("Несоответствие типов");
+                                        }
+
+                                        RPNNumber rPNNumber = new RPNNumber(ERPNType.A_Number);
+                                        rPNNumber.Data = int.Parse(variables[var][1]) / int.Parse(number);
+                                        stack.Push(rPNNumber);
+                                    }
+                                    else if (stack.Peek() is RPNNumber)
+                                    {
+                                        string number2 = (stack.Pop() as RPNNumber).Data.ToString();
+
+                                        RPNNumber rPNNumber = new RPNNumber(ERPNType.A_Number);
+                                        rPNNumber.Data = int.Parse(number2) / int.Parse(number);
+                                        stack.Push(rPNNumber);
+                                    }
+                                    else
+                                    {
+                                        throw new Exception("Неверный тип аргументов");
+                                    }
+                                }
+                            }
                             break;
                     }
                 }
