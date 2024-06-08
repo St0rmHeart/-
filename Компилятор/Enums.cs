@@ -378,7 +378,7 @@
         T_RightBrace,   // }
 
         /// <summary>
-        /// Если TRUE - выполняется идущий дальше код, иначе - переход к MarkIf
+        /// Если TRUE - выполняется идущий дальше код, ина  че - переход к MarkIf
         /// </summary>
         F_ConditionalJumpToMark,
 
