@@ -88,7 +88,7 @@ namespace Компилятор
                 output.Data = inp.Data;
                 return output;
             }
-            if (input is Terminal.TextLine)
+            if (input is Terminal.Boolean)
             {
                 var output = new RPNBoolean(ERPNType.A_Boolean);
                 var inp = input as Terminal.Boolean;
@@ -256,7 +256,7 @@ namespace Компилятор
                         }
                         if (IsVariableInitialization(OperationStack.Last()))
                         {
-                            Output.Add(TranslateToRPNSymbol(Input[1]));
+                            Output.Add(TranslateOperand(Input[1]));
                             Input.Remove(Input[1]);
                             Output.Add(new RPNSymbol(ToArrayInit(OperationStack.Last())));
                         }
