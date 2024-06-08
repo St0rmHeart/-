@@ -372,7 +372,7 @@ namespace Компилятор
         }
         private static void OR_Analyse()
         {
-            if (Data[Pointer + 1] == '&')
+            if (Data[Pointer + 1] == '|')
             {
                 ReadTerminal(ETerminalType.And);
                 Pointer++;
