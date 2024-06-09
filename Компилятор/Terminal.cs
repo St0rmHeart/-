@@ -5,49 +5,76 @@
         /// <summary>
         /// Тип терминала
         /// </summary>
-        public ETerminalType TerminalType { get; }
+        public ETerminal TerminalType { get; }
         public int CharPointer { get; set; }
         public int LinePointer { get; set; }
-        public Terminal(ETerminalType type, int linePointer, int charPointer)
+        public Terminal(ETerminal type, int linePointer, int charPointer)
         {
             TerminalType = type;
             LinePointer = linePointer;
             CharPointer = charPointer;
         }
+        public Terminal(ETerminal type)
+        {
+            TerminalType = type;
+        }
+
+
         public class TextLine : Terminal
         {
             public string Data { get; private set; }
-            public TextLine(ETerminalType type, int linePointer, int charPointer, string data) : base(type, linePointer, charPointer)
+            public TextLine(ETerminal type, int linePointer, int charPointer, string data) : base(type, linePointer, charPointer)
             {
-                if (type != ETerminalType.TextLine) throw new ArgumentException("Неверно создан нетерминал");
+                if (type != ETerminal.TextLine) throw new ArgumentException("Неверно создан нетерминал");
                 Data = data;
             }
         }
         public class Number : Terminal
         {
             public int Data { get; }
-            public Number(ETerminalType type, int linePointer, int charPointer, string data) : base(type, linePointer, charPointer)
+            public Number(ETerminal type, int linePointer, int charPointer, string data) : base(type, linePointer, charPointer)
             {
-                if (type != ETerminalType.Number) throw new ArgumentException("Неверно создан нетерминал");
+                if (type != ETerminal.Number) throw new ArgumentException("Неверно создан нетерминал");
                 Data = Convert.ToInt32(data);
             }
         }
         public class Boolean : Terminal
         {
             public bool Data { get; private set; }
-            public Boolean(ETerminalType type, int linePointer, int charPointer, string data) : base(type, linePointer, charPointer)
+            public Boolean(ETerminal type, int linePointer, int charPointer, string data) : base(type, linePointer, charPointer)
             {
-                if (type != ETerminalType.Boolean) throw new ArgumentException("Неверно создан нетерминал");
+                if (type != ETerminal.Boolean) throw new ArgumentException("Неверно создан нетерминал");
                 Data = Convert.ToBoolean(data);
             }
         }
-        public class Identifier : Terminal
+        public class VariableName : Terminal
         {
             public string Name { get; }
-            public Identifier(ETerminalType type, int linePointer, int charPointer, string data) : base(type, linePointer, charPointer)
+            public VariableName(ETerminal type, int linePointer, int charPointer, string data) : base(type, linePointer, charPointer)
             {
-                if (type != ETerminalType.VariableName) throw new ArgumentException("Неверно создан нетерминал");
+                if (type != ETerminal.VariableName) throw new ArgumentException("Неверно создан нетерминал");
                 Name = data;
+            }
+        }
+        public class MarkDestination : Terminal
+        {
+            private static int _id = 1;
+            public int DMID { get; set; } 
+            public EMarkType MarkType { get; set; }
+            public MarkDestination(ETerminal type, EMarkType markType = EMarkType.None) : base(type)
+            {
+                MarkType = markType;
+                DMID = _id;
+                _id++;
+            }
+        }
+        public class MarkPointer : Terminal
+        {
+            public MarkDestination DestinationMark { get; }
+            public int Destination {  get; set; }
+            public MarkPointer(ETerminal type, MarkDestination destination) : base(type)
+            {
+                DestinationMark = destination;
             }
         }
     }

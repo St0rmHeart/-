@@ -53,26 +53,26 @@ namespace Компилятор
         {
             return Terminals;
         }
-        private static void ReadTerminal(ETerminalType terminalType)
+        private static void ReadTerminal(ETerminal terminalType)
         {
             Terminals.Add(new Terminal(terminalType, _linePointer, _char));
         }
-        private static void ReadTerminal(ETerminalType terminalType, string value)
+        private static void ReadTerminal(ETerminal terminalType, string value)
         {
             
             switch (terminalType)
             {
-                case ETerminalType.Number:
+                case ETerminal.Number:
                     Terminals.Add(new Terminal.Number(terminalType, _linePointer, _char, value));
                     break;
-                case ETerminalType.TextLine:
+                case ETerminal.TextLine:
                     Terminals.Add(new Terminal.TextLine(terminalType, _linePointer, _char, value));
                     break;
-                case ETerminalType.Boolean:
+                case ETerminal.Boolean:
                     Terminals.Add(new Terminal.Boolean(terminalType, _linePointer, _char, value));
                     break;
-                case ETerminalType.VariableName:
-                    Terminals.Add(new Terminal.Identifier(terminalType, _linePointer, _char, value));
+                case ETerminal.VariableName:
+                    Terminals.Add(new Terminal.VariableName(terminalType, _linePointer, _char, value));
                     break;
                 default:
                     throw new NotImplementedException("Невозможный тип терминала");
@@ -121,10 +121,7 @@ namespace Компилятор
 
             else
             {
-                Console.WriteLine($"Некорректный символ: {CurrentChar}" +
-                    $"\tСтрока {_linePointer};" +
-                    $"\tСимвол {_charPointer};");
-                throw new ArgumentOutOfRangeException("символ \"" + CurrentChar + "\" недопустим в грамматике");
+                return "Error";
             }
         }
         
@@ -150,32 +147,32 @@ namespace Компилятор
                     break;
 
                 case "<;>":
-                    ReadTerminal(ETerminalType.Semicolon);
+                    ReadTerminal(ETerminal.Semicolon);
                     Pointer++;
                     break;
 
                 case "<+>":
-                    ReadTerminal(ETerminalType.Plus);
+                    ReadTerminal(ETerminal.Plus);
                     Pointer++;
                     break;
 
                 case "<->":
-                    ReadTerminal(ETerminalType.Minus);
+                    ReadTerminal(ETerminal.Minus);
                     Pointer++;
                     break;
 
                 case "<*>":
-                    ReadTerminal(ETerminalType.Multiply);
+                    ReadTerminal(ETerminal.Multiply);
                     Pointer++;
                     break;
 
                 case "</>":
-                    ReadTerminal(ETerminalType.Divide);
+                    ReadTerminal(ETerminal.Divide);
                     Pointer++;
                     break;
 
                 case "<%>":
-                    ReadTerminal(ETerminalType.Modulus);
+                    ReadTerminal(ETerminal.Modulus);
                     Pointer++;
                     break;
 
@@ -200,37 +197,37 @@ namespace Компилятор
                     break;
 
                 case "<!>":
-                    ReadTerminal(ETerminalType.Not);
+                    ReadTerminal(ETerminal.Not);
                     Pointer++;
                     break;
 
                 case "<(>":
-                    ReadTerminal(ETerminalType.LeftParen);
+                    ReadTerminal(ETerminal.LeftParen);
                     Pointer++;
                     break;
 
                 case "<)>":
-                    ReadTerminal(ETerminalType.RightParen);
+                    ReadTerminal(ETerminal.RightParen);
                     Pointer++;
                     break;
 
                 case "<[>":
-                    ReadTerminal(ETerminalType.LeftBracket);
+                    ReadTerminal(ETerminal.LeftBracket);
                     Pointer++;
                     break;
 
                 case "<]>":
-                    ReadTerminal(ETerminalType.RightBracket);
+                    ReadTerminal(ETerminal.RightBracket);
                     Pointer++;
                     break;
 
                 case "<{>":
-                    ReadTerminal(ETerminalType.LeftBrace);
+                    ReadTerminal(ETerminal.LeftBrace);
                     Pointer++;
                     break;
 
                 case "<}>":
-                    ReadTerminal(ETerminalType.RightBrace);
+                    ReadTerminal(ETerminal.RightBrace);
                     Pointer++;
                     break;
 
@@ -238,7 +235,7 @@ namespace Компилятор
                     Console.WriteLine($"Некорректный сомвол: {CurrentChar}" +
                     $"\tСтрока {_linePointer};" +
                     $"\tСимвол {_charPointer};");
-                    throw new Exception("Недопустимый символ.");
+                    throw new Exception($"\nНедопустимый символ\nСтрока {_linePointer};\nСимвол {_charPointer};\n");
             }
         }
         private static void NUM_Analyse()
@@ -250,7 +247,7 @@ namespace Компилятор
                 Pointer++;
             }
             while (CurentCharGroup() == "<ц>");
-            ReadTerminal(ETerminalType.Number, number);
+            ReadTerminal(ETerminal.Number, number);
         }
         private static void ID_Analyse()
         {
@@ -260,44 +257,44 @@ namespace Компилятор
                 identifier += CurrentChar;
                 Pointer++;
             }
-            while (CurentCharGroup() == "<ц>" || CurentCharGroup() == "<б>");
+            while (Pointer < Data.Length && (CurentCharGroup() == "<ц>" || CurentCharGroup() == "<б>"));
             
             switch (identifier)
             {
                 case "while":
-                    ReadTerminal(ETerminalType.While);
+                    ReadTerminal(ETerminal.While);
                     break;
 
                 case "if":
-                    ReadTerminal(ETerminalType.If);
+                    ReadTerminal(ETerminal.If);
                     break;
 
                 case "else":
-                    ReadTerminal(ETerminalType.Else);
+                    ReadTerminal(ETerminal.Else);
                     break;
 
                 case "int":
-                    ReadTerminal(ETerminalType.Int);
+                    ReadTerminal(ETerminal.Int);
                     break;
 
                 case "string":
-                    ReadTerminal(ETerminalType.String);
+                    ReadTerminal(ETerminal.String);
                     break;
 
                 case "bool":
-                    ReadTerminal(ETerminalType.Bool);
+                    ReadTerminal(ETerminal.Bool);
                     break;
 
                 case "input":
-                    ReadTerminal(ETerminalType.Input);
+                    ReadTerminal(ETerminal.Input);
                     break;
 
                 case "output":
-                    ReadTerminal(ETerminalType.Output);
+                    ReadTerminal(ETerminal.Output);
                     break;
 
                 default:
-                    ReadTerminal(ETerminalType.VariableName, identifier);
+                    ReadTerminal(ETerminal.VariableName, identifier);
                     break;
             }
 
@@ -313,18 +310,18 @@ namespace Компилятор
             }
             while (CurentCharGroup() != "<\">");
             Pointer++;
-            ReadTerminal(ETerminalType.TextLine, textLine);
+            ReadTerminal(ETerminal.TextLine, textLine);
         }
         private static void LESS_Analyse()
         {
             if (Data[Pointer+1] == '=')
             {
-                ReadTerminal(ETerminalType.LessEqual);
+                ReadTerminal(ETerminal.LessEqual);
                 Pointer++;
             }
             else
             {
-                ReadTerminal(ETerminalType.Less);
+                ReadTerminal(ETerminal.Less);
             }
             Pointer++;
         }
@@ -332,12 +329,12 @@ namespace Компилятор
         {
             if (Data[Pointer + 1] == '=')
             {
-                ReadTerminal(ETerminalType.GreaterEqual);
+                ReadTerminal(ETerminal.GreaterEqual);
                 Pointer++;
             }
             else
             {
-                ReadTerminal(ETerminalType.Greater);
+                ReadTerminal(ETerminal.Greater);
             }
             Pointer++;
         }
@@ -345,12 +342,12 @@ namespace Компилятор
         {
             if (Data[Pointer + 1] == '=')
             {
-                ReadTerminal(ETerminalType.Equal);
+                ReadTerminal(ETerminal.Equal);
                 Pointer++;
             }
             else
             {
-                ReadTerminal(ETerminalType.Assignment);
+                ReadTerminal(ETerminal.Assignment);
             }
             Pointer++;
         }
@@ -358,7 +355,7 @@ namespace Компилятор
         {
             if (Data[Pointer + 1] == '&')
             {
-                ReadTerminal(ETerminalType.And);
+                ReadTerminal(ETerminal.And);
                 Pointer++;
                 Pointer++;
             }
@@ -374,7 +371,7 @@ namespace Компилятор
         {
             if (Data[Pointer + 1] == '&')
             {
-                ReadTerminal(ETerminalType.And);
+                ReadTerminal(ETerminal.And);
                 Pointer++;
                 Pointer++;
             }

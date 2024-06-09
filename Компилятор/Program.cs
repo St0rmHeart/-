@@ -1,3 +1,5 @@
+using System.Security.AccessControl;
+
 namespace Компилятор
 {
     public static class Programm
@@ -16,7 +18,7 @@ namespace Компилятор
                 throw new Exception();
             }
 
-            List<RPNSymbol> rpn;
+            List<Terminal> rpn;
             if (SyntacticalAnalyzer.IsSyntacticalCorrect(terminals))
             {
                 rpn = RPNTranslator.ConvertToRPN(terminals);
@@ -25,18 +27,7 @@ namespace Компилятор
             {
                 throw new Exception();
             }
-            int i = 0;
-            foreach (var rpnsymvol in rpn)
-            {
-                Console.Write($"{i++,3} {rpnsymvol.RPNType}");
-                if (rpnsymvol is RPNMark)
-                {
-                    var r = rpnsymvol as RPNMark;
-                    Console.Write(" " + r.Position.ToString());
-                }
-                Console.WriteLine();
-            }
-            RPNInterpreter.ExecuteInstructions(rpn);
+            
         }
     }
 }

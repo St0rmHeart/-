@@ -1,426 +1,554 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml;
-
 namespace Компилятор
 {
+
     public static class RPNTranslator
     {
-        static List<Terminal> Input = new List<Terminal>();
-        public static List<RPNSymbol> Output = new List<RPNSymbol>();
-        public static List<RPNMark> TempMarks = new List<RPNMark>();
-        public static List<RPNMark> ConstMarks = new List<RPNMark>();
-        static List<RPNSymbol> OperationStack = new List<RPNSymbol>();
+        private static Dictionary<ETerminal, int> OperatorsPriority { get; } = new Dictionary<ETerminal, int>
+        {
+            // - (unary minus)
+            { ETerminal.UnaryMinus, 7 },
+            // * / % (multiplicative operators)
+            { ETerminal.Multiply, 6 },
+            { ETerminal.Divide, 6 },
+            { ETerminal.Modulus, 6 },
+            // + - (additive operators)
+            { ETerminal.Plus, 5 },
+            { ETerminal.Minus, 5 },
+            // < > <= >= == (relational operators)
+            { ETerminal.Less, 4 },
+            { ETerminal.Greater, 4 },
+            { ETerminal.LessEqual, 4 },
+            { ETerminal.GreaterEqual, 4 },
+            { ETerminal.Equal, 4 },
+            // ! (unary negation)
+            { ETerminal.Not, 3 },
+            // && (logical AND)
+            { ETerminal.And, 2 },
+            // || (logical OR)
+            { ETerminal.Or, 1 },
+            //
+            { ETerminal.GetByIndex, 0 },
+            // = (assignment operator)
+            { ETerminal.Assignment, -1 },
+            // other
+            { ETerminal.Int, -2 },
+            { ETerminal.Bool, -2 },
+            { ETerminal.String, -2 },
+            { ETerminal.IntArray, -2 },
+            { ETerminal.BoolArray, -2 },
+            { ETerminal.StringArray, -2 },
+            
+            // groups
+            { ETerminal.CondMark, -3 },
+            { ETerminal.LeftBrace, -3 },
+            { ETerminal.LeftBracket, -3 },
+            { ETerminal.LeftParen, -3 },
+
+
+        };
+        private static Dictionary<ETerminal, ETerminalGroup> GroupOfTerminal { get; } = new()
+        {
+            { ETerminal.Number,         ETerminalGroup.Data },
+            { ETerminal.TextLine,       ETerminalGroup.Data },
+            { ETerminal.Boolean,        ETerminalGroup.Data },
+            { ETerminal.VariableName,   ETerminalGroup.Data },
+            { ETerminal.GetByIndex,     ETerminalGroup.Data },
+            { ETerminal.MarkDestination,ETerminalGroup.Data },
+            { ETerminal.MarkPointer,    ETerminalGroup.Data },
+            { ETerminal.CondMark,       ETerminalGroup.Data },
+
+            { ETerminal.Plus,           ETerminalGroup.Operator },
+            { ETerminal.Minus,          ETerminalGroup.Operator },
+            { ETerminal.Multiply,       ETerminalGroup.Operator },
+            { ETerminal.Divide,         ETerminalGroup.Operator },
+            { ETerminal.Modulus,        ETerminalGroup.Operator },
+            { ETerminal.And,            ETerminalGroup.Operator },
+            { ETerminal.Or,             ETerminalGroup.Operator },
+            { ETerminal.Not,            ETerminalGroup.Operator },
+            { ETerminal.Equal,          ETerminalGroup.Operator },
+            { ETerminal.Less,           ETerminalGroup.Operator },
+            { ETerminal.Greater,        ETerminalGroup.Operator },
+            { ETerminal.LessEqual,      ETerminalGroup.Operator },
+            { ETerminal.GreaterEqual,   ETerminalGroup.Operator },
+            { ETerminal.Assignment,     ETerminalGroup.Operator },
+            
+
+            { ETerminal.LeftParen,      ETerminalGroup.GroupSymbol },
+            { ETerminal.RightParen,     ETerminalGroup.GroupSymbol },
+            { ETerminal.LeftBracket,    ETerminalGroup.GroupSymbol },
+            { ETerminal.RightBracket,   ETerminalGroup.GroupSymbol },
+            { ETerminal.LeftBrace,      ETerminalGroup.GroupSymbol },
+            { ETerminal.RightBrace,     ETerminalGroup.GroupSymbol },
+            { ETerminal.Semicolon,      ETerminalGroup.GroupSymbol },
+
+            { ETerminal.If,             ETerminalGroup.Reserved },
+            { ETerminal.While,          ETerminalGroup.Reserved },
+            { ETerminal.Int,            ETerminalGroup.Reserved },
+            { ETerminal.String,         ETerminalGroup.Reserved },
+            { ETerminal.Bool,           ETerminalGroup.Reserved },
+            { ETerminal.Output,         ETerminalGroup.Reserved },
+            { ETerminal.Input,          ETerminalGroup.Reserved },
+
+            
+        };
+        private static List<Terminal> RPN { get; } = [];
+        private static Stack<Terminal> OperationsStack { get; } = [];
+        
+
         /// <summary>
-        /// Возвращает список типа RPNTranslator в формате польской строки из входного списка типа Terminal
+        /// Нахождение индекса парной закрывающейся скобки
         /// </summary>
-        public static List<RPNSymbol> ConvertToRPN(List<Terminal> input)
+        private static int FindPairedClosingBracket(int leftParenIndex, List<Terminal> terminals)
         {
-            Input = input;
-            while (Input.Count > 0)
+            var openingBracket = terminals[leftParenIndex].TerminalType;
+            var closingBracket = openingBracket switch
             {
-                // если любая левая скобка 
-                if (IsOpeningParenthesis(Input[0]))
-                {
-                    OperationStack.Add(TranslateToRPNSymbol(Input[0]));
-                    Input.Remove(Input.First());
-                }
-                //Если операция или скобка - кладём в стек
-                else if (IsOperationOrParenthesis(Input[0]))
-                {
-                    ToStack(TranslateToRPNSymbol(Input[0]));
-                    Input.Remove(Input.First());
-                }
-                //Если операнд - кладём в Output
-                else if (IsOperand(Input[0]))
-                {
-                    Output.Add(TranslateOperand(Input[0]));
-                    Input.Remove(Input.First());
-                }
-                //while обрабатывается особым образом
-                else if (Input[0].TerminalType == ETerminalType.While)
-                {
-                    OperationStack.Add(new RPNSymbol(ERPNType.F_ConditionalJumpToMark));
-                    OperationStack.Add(new RPNMark(ERPNType.М_Mark, EMarkType.WhileBeginMark));
-                    TempMarks.Add(new RPNMark(ERPNType.М_Mark, EMarkType.WhileBeginMark));
-                    TempMarks.Last().Position = Output.Count;
-                    Input.Remove(Input.First());
-                }
-                //if обрабатывается особым образом
-                else if (Input[0].TerminalType == ETerminalType.If)
-                {
-                    OperationStack.Add(new RPNSymbol(ERPNType.F_ConditionalJumpToMark));
-                    OperationStack.Add(new RPNMark(ERPNType.М_Mark,EMarkType.IfMark));
-                    TempMarks.Add(new RPNMark(ERPNType.М_Mark, EMarkType.IfMark));
-                    Input.Remove(Input.First());
-                }
-                //else обрабатывается особым образом
-                else if (Input[0].TerminalType == ETerminalType.Else)
-                {
-                    Input.Remove(Input.First());
-                }
-            }
-            //После завершения считывания строки все оставшиеся OperationStack в стеке записываются в Output
-            while (OperationStack.Count > 0)
+                ETerminal.LeftParen => ETerminal.RightParen,
+                ETerminal.LeftBrace => ETerminal.RightBrace,
+                ETerminal.LeftBracket => ETerminal.RightBracket,
+                _ => throw new ArgumentException(),
+            };
+            int counter = 0;
+            for (int i = leftParenIndex; i < terminals.Count; i++)
             {
-                if (IsWritableInOutput(OperationStack.Last()))
+                if (terminals[i].TerminalType == openingBracket)
                 {
-                    Output.Add(OperationStack.Last());
+                    counter++;
                 }
-                OperationStack.Remove(OperationStack.Last());
-            }
-            WriteMarks();
-            return Output;
-        }
-        public static RPNSymbol TranslateOperand(Terminal input)
-        {
-            if (input is Terminal.TextLine)
-            {
-                var output = new RPNTextLine(ERPNType.A_TextLine);
-                var inp = input as Terminal.TextLine;
-                output.CharPointer = inp.CharPointer;
-                output.LinePointer = inp.LinePointer;
-                output.Data = inp.Data;
-                return output;
-            }
-            if (input is Terminal.Boolean)
-            {
-                var output = new RPNBoolean(ERPNType.A_Boolean);
-                var inp = input as Terminal.Boolean;
-                output.CharPointer = inp.CharPointer;
-                output.LinePointer = inp.LinePointer;
-                output.Data = inp.Data;
-                return output;
-            }
-            if (input is Terminal.Number)
-            {
-                var output = new RPNNumber(ERPNType.A_Number);
-                var inp = input as Terminal.Number;
-                output.CharPointer = inp.CharPointer;
-                output.LinePointer = inp.LinePointer;
-                output.Data = inp.Data;
-                return output;
-            }
-            if (input is Terminal.Identifier)
-            {
-                var output = new RPNIdentifier(ERPNType.A_VariableName);
-                var inp = input as Terminal.Identifier;
-                output.CharPointer = inp.CharPointer;
-                output.LinePointer = inp.LinePointer;
-                output.Name = inp.Name;
-                return output;
-            }
-            //заглушка чтобы он не ругался
-            var ou = new RPNSymbol(ERPNType.A_VariableName);
-            return ou;
-        }
-        public static void WriteMarks()
-        {
-            for (int i = 0; i < Output.Count; i++)
-            {
-                if (Output[i] is RPNMark)
+                if (terminals[i].TerminalType == closingBracket)
                 {
-                    if (ConstMarks.Count > 0)
+                    counter--;
+                    if (counter == 0)
                     {
-                        var ou = Output[i] as RPNMark;
-                        ou.Position = ConstMarks[0].Position;
-                        ConstMarks.Remove(ConstMarks[0]);
+                        return i;
                     }
-                    else
-                    {
+                }
+            }
+            return -1;
+        }
+
+        public static List<Terminal> ConvertToRPN(List<Terminal> terminals)
+        {
+            for (int i = 0; i < terminals.Count; i++)
+            {
+                // берём терминал
+                var terminal = terminals[i];
+                // определяем его тип
+                var terminalType = terminal.TerminalType;
+                // в зависимотсти от типа терминала
+                switch (GroupOfTerminal[terminalType])
+                {
+                    // если это данные
+                    case ETerminalGroup.Data:
+                        // добавляем в ОПС
+                        RPN.Add(terminal);
                         break;
-                    }
+
+                    // если это оператор
+                    case ETerminalGroup.Operator:
+
+                        // если это минус и предшествующий оператор не data
+                        if (terminal.TerminalType == ETerminal.Minus &&
+                            terminals.ElementAtOrDefault(i - 1) != null &&
+                            GroupOfTerminal[terminals[i - 1].TerminalType] != ETerminalGroup.Data)
+                        {
+                            // значит это унарный минус и его надо добавить в стек
+                            OperationsStack.Push(terminal);
+                        }
+                        //Если это не унарный минус
+                        else
+                        {
+                            // если стек операторов пустой
+                            if (OperationsStack.Count == 0)
+                            {
+                                // добавляем оператор в стек
+                                OperationsStack.Push(terminal);
+                            }
+                            // если в стеке что-то есть
+                            else
+                            {
+                                // пока стек не пустой
+                                // и приоритет верхнего оператора в стеке выше или равен приоритету текущего оператора
+                                while (OperationsStack.Count > 0 &&
+                                       OperatorsPriority[OperationsStack.Peek().TerminalType] >= OperatorsPriority[terminal.TerminalType])
+                                {
+                                    //вытаскиваем оператор из стека и записываем его в ОПС
+                                    RPN.Add(OperationsStack.Pop());
+                                }
+                                // добавляем оператор в стэк
+                                OperationsStack.Push(terminal);
+                            }
+                        }
+                        break;
+
+                    // если это зарезервированное слово
+                    case ETerminalGroup.Reserved:
+                        switch (terminal.TerminalType)
+                        {
+                            // если это while
+                            case ETerminal.While:
+                                InsertWhile(terminals, i);
+                                i--;
+                                break;
+                            case ETerminal.If:
+                                InsertIf(terminals, i);
+                                i--;
+                                break;
+
+                            case ETerminal.Int:
+                                if (terminals[i+1].TerminalType == ETerminal.LeftBracket)
+                                {
+                                    OperationsStack.Push(new Terminal(ETerminal.IntArray));
+                                }
+                                else
+                                {
+                                    OperationsStack.Push(new Terminal(ETerminal.Int));
+                                }
+                                break;
+                            case ETerminal.String:
+                                if (terminals[i + 1].TerminalType == ETerminal.LeftBracket)
+                                {
+                                    OperationsStack.Push(new Terminal(ETerminal.StringArray));
+                                }
+                                else
+                                {
+                                    OperationsStack.Push(new Terminal(ETerminal.String));
+                                }
+                                break;
+                            case ETerminal.Bool:
+                                if (terminals[i + 1].TerminalType == ETerminal.LeftBracket)
+                                {
+                                    OperationsStack.Push(new Terminal(ETerminal.BoolArray));
+                                }
+                                else
+                                {
+                                    OperationsStack.Push(new Terminal(ETerminal.Bool));
+                                }
+                                break;
+
+                            case ETerminal.Output:
+                                OperationsStack.Push(terminal);
+                                break;
+                            case ETerminal.Input:
+                                OperationsStack.Push(terminal);
+                                break;
+                        }
+                        break;
+
+                    // если это символл группировки
+                    case ETerminalGroup.GroupSymbol:
+                        switch (terminal.TerminalType)
+                        {
+                            // если это открывающаяся скобка
+                            case ETerminal.LeftParen:
+                                OperationsStack.Push(terminal);
+                                break;
+                            case ETerminal.LeftBracket:
+                                InsertLeftBracket(terminals, i);
+                                break;
+                            case ETerminal.LeftBrace:
+                                OperationsStack.Push(terminal);
+                                break;
+
+                            // если это закрывающаяся скобка
+                            case ETerminal.RightParen:
+                                while (OperationsStack.Peek().TerminalType != ETerminal.LeftParen)
+                                {
+                                    RPN.Add(OperationsStack.Pop());
+                                }
+                                OperationsStack.Pop();
+                                break;
+                            case ETerminal.RightBracket:
+                                while (OperationsStack.Peek().TerminalType != ETerminal.LeftBracket)
+                                {
+                                    RPN.Add(OperationsStack.Pop());
+                                }
+                                OperationsStack.Pop();
+                                break;
+                            case ETerminal.RightBrace:
+                                while (OperationsStack.Peek().TerminalType != ETerminal.LeftBrace)
+                                {
+                                    RPN.Add(OperationsStack.Pop());
+                                }
+                                OperationsStack.Pop();
+                                break;
+
+                            // если это ;
+                            case ETerminal.Semicolon:
+                                while (OperationsStack.Count > 0 && OperationsStack.Peek().TerminalType != ETerminal.LeftBrace)
+                                {
+                                    RPN.Add(OperationsStack.Pop());
+                                }
+                                break;
+                        }
+                        break;
                 }
             }
-        }
-        /// <summary>
-        /// Возвращает true если input можно записать в OperationStack
-        /// </summary>
-        public static bool IsWritableInOperationStack(RPNSymbol input)
-        {
-            if ((input.RPNType == ERPNType.T_Semicolon) || (input.RPNType == ERPNType.T_RightParen) || (input.RPNType == ERPNType.T_RightBracket) || (input.RPNType == ERPNType.T_RightBrace) || (input.RPNType == ERPNType.T_LeftParen))
-            {
-                return false;
-            }
-            return true;
-        }
-        public static bool IsOpeningParenthesis(Terminal input)
-        {
-            if ((input.TerminalType == ETerminalType.LeftParen) || (input.TerminalType == ETerminalType.LeftBracket) || (input.TerminalType == ETerminalType.LeftBrace))
-            {
-                return true;
-            }
-            return false;
-        }
-        /// <summary>
-        /// Возвращает true если input можно записать в Output
-        /// </summary>
-        public static bool IsWritableInOutput(RPNSymbol input)
-        {
-            if ((input.RPNType == ERPNType.T_Semicolon) || (input.RPNType == ERPNType.T_RightParen) || (input.RPNType == ERPNType.T_RightBracket) || (input.RPNType == ERPNType.T_RightBrace) || (input.RPNType == ERPNType.T_LeftBrace) || (input.RPNType == ERPNType.T_LeftParen) || (input.RPNType == ERPNType.T_LeftBracket))
-            {
-                return false;
-            }
-            return true;
-        }
-        /// <summary>
-        /// Возвращает true если input - операнд
-        /// </summary>
-        public static bool IsOperand(Terminal input)
-        {
-            if ((input.TerminalType == ETerminalType.Number) || (input.TerminalType == ETerminalType.TextLine) || (input.TerminalType == ETerminalType.Boolean) || (input.TerminalType == ETerminalType.VariableName))
-            {
-                return true;
-            }
-            return false;
-        }
-        /// <summary>
-        /// Возвращает true если input - операция или скобка
-        /// </summary>
-        public static bool IsOperationOrParenthesis(Terminal input)
-        {
-            if ((input.TerminalType == ETerminalType.Int) || (input.TerminalType == ETerminalType.String) || (input.TerminalType == ETerminalType.Bool) || (input.TerminalType == ETerminalType.Semicolon) || (input.TerminalType == ETerminalType.Output) || (input.TerminalType == ETerminalType.Input) || (input.TerminalType == ETerminalType.Assignment) || (input.TerminalType == ETerminalType.And) || (input.TerminalType == ETerminalType.Or) || (input.TerminalType == ETerminalType.Equal) || (input.TerminalType == ETerminalType.Less) || (input.TerminalType == ETerminalType.Greater) || (input.TerminalType == ETerminalType.GreaterEqual) || (input.TerminalType == ETerminalType.LessEqual) || (input.TerminalType == ETerminalType.Plus) || (input.TerminalType == ETerminalType.Minus) || (input.TerminalType == ETerminalType.Divide) || (input.TerminalType == ETerminalType.Multiply) || (input.TerminalType == ETerminalType.Modulus) || (input.TerminalType == ETerminalType.Not) ||  (input.TerminalType == ETerminalType.LeftParen) || (input.TerminalType == ETerminalType.RightParen) || (input.TerminalType == ETerminalType.RightBracket) || (input.TerminalType == ETerminalType.LeftBracket) || (input.TerminalType == ETerminalType.RightBrace) || (input.TerminalType == ETerminalType.LeftBrace))
-            {
-                return true;
-            }
-            return false;
-        }
-        /// <summary>
-        /// Возвращает true если input - функция инициализации переменной
-        /// </summary>
-        public static bool IsVariableInitialization(RPNSymbol input)
-        {
-            if ((input.RPNType == ERPNType.F_Int) || (input.RPNType == ERPNType.F_String) || (input.RPNType == ERPNType.F_Bool))
-            {
-                return true;
-            }
-            return false;
-        }
 
-        /// <summary>
-        /// Переносит оператор input из списка Input в OperatorStack
-        /// </summary>
-        public static void ToStack(RPNSymbol input)
-        {
-            if (OperationStack.Count > 0)
+            foreach (var terminal in RPN)
             {
-                //Если входная лексема - правая круглая скобка, то в Output записываются все операции из OperationStack пока там не найдётся левая круглая скобка
-                if ((OperationStack.Count > 0) && (input.RPNType == ERPNType.T_RightParen))
+                if (terminal is Terminal.MarkPointer markPointer)
                 {
-                    while ((OperationStack.Count > 0) && (OperationStack.Last().RPNType != ERPNType.T_LeftParen))
-                    {
-                        if (IsWritableInOutput(OperationStack.Last()))
-                        {
-                            Output.Add(OperationStack.Last());
-                        }
-                        OperationStack.Remove(OperationStack.Last());
-                    }
-                    //Если левая круглая скобка - условие If или While, то в Output записываются соответствующие символы
-                    if (OperationStack.Count > 1)
-                    {
-                        OperationStack.Remove(OperationStack.Last());
-                        if (OperationStack.Last().RPNType == ERPNType.М_Mark)
-                        {
-                            if (IsWritableInOutput(OperationStack.Last()))
-                                Output.Add(OperationStack.Last());
-                            OperationStack.Remove(OperationStack.Last());
-                            if (IsWritableInOutput(OperationStack.Last()))
-                                Output.Add(OperationStack.Last());
-                            OperationStack.Remove(OperationStack.Last());
-                        }
-                    }
-                }
+                    // Заданное значение DMID для поиска
+                    int targetDMID = markPointer.DestinationMark.DMID;
 
-                else if ((OperationStack.Count > 0) && (input.RPNType == ERPNType.T_RightBracket))
-                {
-                    //Если входная лексема - правая квадратная скобка, то в Output записываются все операции из OperationStack пока там не найдётся левая квадратная скобка
-                    while ((OperationStack.Count > 0) && (OperationStack.Last().RPNType != ERPNType.T_LeftBracket))
-                    {
-                        if (IsWritableInOutput(OperationStack.Last()))
-                        {
-                            Output.Add(OperationStack.Last());
-                        }
-                        OperationStack.Remove(OperationStack.Last());
-                    }
-                    //Если перед левой квадратной скобкой стоит операция инициализации переменной - в Output записывается операция инициализации массива переменных такого типа
-                    if ((OperationStack.Count > 1) && IsVariableInitialization(OperationStack[OperationStack.Count-2]))
-                    {
-                        if (OperationStack.Last().RPNType == ERPNType.T_LeftBracket)
-                        {
-                            OperationStack.Remove(OperationStack.Last());
-                        }
-                        if (IsVariableInitialization(OperationStack.Last()))
-                        {
-                            Output.Add(TranslateOperand(Input[1]));
-                            Input.Remove(Input[1]);
-                            Output.Add(new RPNSymbol(ToArrayInit(OperationStack.Last())));
-                        }
-                        OperationStack.Remove(OperationStack.Last());
-                    }
-                    //Иначе - в Output записывается операция индексации
-                    else if (OperationStack.Count > 0)
-                    {
-                        Output.Add(new RPNSymbol(ERPNType.F_Index));
-                        OperationStack.Remove(OperationStack.Last());
-                    }
-                }
-
-                //Если входная лексема - правая фигурная скобка, то в Output записываются все операции из OperationStack пока там не найдётся левая фигурная скобка
-                else if ((OperationStack.Count > 0) && (input.RPNType == ERPNType.T_RightBrace))
-                {
-                    while ((OperationStack.Count > 0) && (OperationStack.Last().RPNType != ERPNType.T_LeftBrace))
-                    {
-                        if (IsWritableInOutput(OperationStack.Last()))
-                        {
-                            Output.Add(OperationStack.Last());
-                        }
-                        OperationStack.Remove(OperationStack.Last());
-                    }
-                    //Обработка while
-                    if ((TempMarks.Count > 0) && (TempMarks.Last().MarkType == EMarkType.WhileBeginMark))
-                    {
-                        TempMarks.Add(new RPNMark(ERPNType.М_Mark, EMarkType.WhileEndMark));
-                        Output.Add(new RPNMark(ERPNType.М_Mark, EMarkType.WhileEndMark));
-                        Output.Add(new RPNSymbol(ERPNType.F_UnconditionalJumpToMark));
-                        TempMarks.Last().Position = Output.Count;
-                        //TempMarks[TempMarks.Count-2].Position = TempMarks[TempMarks.Count - 2].Position;
-                        ConstMarks.Add(TempMarks.Last());
-                        ConstMarks.Add(TempMarks[TempMarks.Count-2]);
-                        TempMarks.Remove(TempMarks.Last());
-                        TempMarks.Remove(TempMarks.Last());
-                    }
-                    //Обработка if
-                    else if ((TempMarks.Count > 0) && (TempMarks.Last().MarkType == EMarkType.IfMark))
-                    {
-                        TempMarks.Last().Position = Output.Count();
-                        ConstMarks.Add(TempMarks.Last());
-                        TempMarks.Remove(TempMarks.Last());
-
-                        if ((Input.Count() > 1) && (Input[1].TerminalType == ETerminalType.Else))
-                        {
-                            ConstMarks.Last().Position += 2;
-                            Output.Add(new RPNMark(ERPNType.М_Mark, EMarkType.ElseMark));
-                            TempMarks.Add(new RPNMark(ERPNType.М_Mark, EMarkType.ElseMark));
-                            Output.Add(new RPNSymbol(ERPNType.F_UnconditionalJumpToMark));
-                        }
-                    }
-                    else if ((TempMarks.Count > 0) && (TempMarks.Last().MarkType == EMarkType.ElseMark))
-                    {
-                        TempMarks.Last().Position = Output.Count();
-                        ConstMarks.Add(TempMarks.Last());
-                        TempMarks.Remove(TempMarks.Last());
-                    }
-                }
-
-                else
-                {
-                    while ((OperationStack.Count > 0) && (GetRPNSymbolPriority(OperationStack.Last()) > GetRPNSymbolPriority(input)))
-                    {
-                        if (IsWritableInOutput(OperationStack.Last()))
-                        {
-                            Output.Add(OperationStack.Last());
-                        }
-                        OperationStack.Remove(OperationStack.Last());
-                    }
+                    // Поиск индекса объекта с заданным DMID
+                    int index = RPN.FindIndex(t => t is Terminal.MarkDestination md && md.DMID == targetDMID);
                 }
             }
-            if (IsWritableInOperationStack(input))
+            File.WriteAllText("RPN.txt", RPNToString());
+            return RPN;
+        }
+
+        /// <summary>
+        /// Редактирование последовательности терминалов для работы while
+        /// </summary>
+        /// <param name="terminals"></param>
+        public static void InsertWhile(List<Terminal> terminals, int whilePos)
+        {
+            // имеем
+            // <Обработанная часть> while ( <Логическое или> ) { <Блок инструкций> } <Не Обработанняа часть>
+            // хотим получить
+            // <Обработанная часть> md2 ( <Логическое или> ) cond mp1 { <Блок инструкций> } mp2 md1 <Не Обработанняа часть>
+
+            Terminal.MarkDestination md1 = new(ETerminal.MarkDestination);
+            Terminal.MarkDestination md2 = new(ETerminal.MarkDestination);
+            Terminal.MarkPointer mp1 = new(ETerminal.MarkPointer, md1);
+            Terminal.MarkPointer mp2 = new(ETerminal.MarkPointer, md2);
+            Terminal cond = new(ETerminal.CondMark);
+
+            // на место while ставим метку-назначение1
+            terminals[whilePos] = md2;
+
+            // находим индекс (
+            int leftParenIndex = terminals.FindIndex(whilePos, t => t.TerminalType == ETerminal.LeftParen);
+
+            // находим индекс )
+            int rightParenIndex = FindPairedClosingBracket(leftParenIndex, terminals);
+
+            // вставляем метку-указатель1 после )
+            terminals.Insert(rightParenIndex + 1, mp1);
+
+            // вставляем оператор условного перехода на метку-указатель2 после )
+            terminals.Insert(rightParenIndex + 1, cond);
+
+            // находим индекс {
+            int leftBraceIndex = terminals.FindIndex(rightParenIndex, t => t.TerminalType == ETerminal.LeftBrace);
+
+            // находим индекс }
+            int rightBraceIndex = FindPairedClosingBracket(leftBraceIndex, terminals);
+
+            // вставляем метку-назначение1 после }
+            terminals.Insert(rightBraceIndex + 1, md1);
+
+            // вставляем метку-указатель2 после }
+            terminals.Insert(rightBraceIndex + 1, mp2);
+        }
+
+        /// <summary>
+        /// Редактирование последовательности терминалов для работы if
+        /// </summary>
+        /// <param name="terminals"></param>
+        public static void InsertIf(List<Terminal> terminals, int ifPos)
+        {
+            // имеем
+            //
+            // варинат 1
+            // <Обработанная часть> if ( <Логическое или> ) { <Блок инструкций> } <Не Обработанняа часть>
+            // хотим получить
+            // <Обработанная часть> ( <Логическое или> ) cond mp1 { <Блок инструкций> } md1 <Не Обработанняа часть>
+            //
+            // варинат 2
+            // <Обработанная часть> if ( <Логическое или> ) { <Блок инструкций> } else { <Блок инструкций> } <Не Обработанняа часть>
+            // хотим получить
+            // <Обработанная часть> ( <Логическое или> ) cond mp1 { <Блок инструкций> } mp2 md1 { <Блок инструкций> } md2 <Не Обработанняа часть>
+
+            Terminal.MarkDestination md1 = new(ETerminal.MarkDestination);
+            Terminal.MarkDestination md2 = new(ETerminal.MarkDestination);
+            Terminal.MarkPointer mp1 = new(ETerminal.MarkPointer, md1);
+            Terminal.MarkPointer mp2 = new(ETerminal.MarkPointer, md2);
+            Terminal cond = new(ETerminal.CondMark);
+
+            // удаляем if
+            terminals.RemoveAt(ifPos);
+
+            // находим индекс (
+            int leftParenIndex = terminals.FindIndex(ifPos, t => t.TerminalType == ETerminal.LeftParen);
+
+            // находим индекс )
+            int rightParenIndex = FindPairedClosingBracket(leftParenIndex, terminals);
+
+            // вставляем метку-указатель1 после )
+            terminals.Insert(rightParenIndex + 1, mp1);
+
+            // вставляем оператор условного перехода на метку-указатель2 после )
+            terminals.Insert(rightParenIndex + 1, cond);
+
+            // находим индекс {
+            int leftBraceIndex = terminals.FindIndex(rightParenIndex, t => t.TerminalType == ETerminal.LeftBrace);
+
+            // находим индекс }
+            int rightBraceIndex = FindPairedClosingBracket(leftBraceIndex, terminals);
+
+            if (rightBraceIndex + 1 < terminals.Count && terminals[rightBraceIndex + 1].TerminalType == ETerminal.Else)
             {
-                OperationStack.Add(input);
+                // удаляем else
+                terminals.RemoveAt(rightBraceIndex + 1);
+
+                // вставляем метку-назначение1 после }
+                terminals.Insert(rightBraceIndex + 1, md1);
+
+                // вставляем метку-указатель2 после }
+                terminals.Insert(rightBraceIndex + 1, mp2);
+
+
+                // находим индекс {
+                leftBraceIndex = terminals.FindIndex(rightBraceIndex, t => t.TerminalType == ETerminal.LeftBrace);
+
+                // находим индекс }
+                rightBraceIndex = FindPairedClosingBracket(leftBraceIndex, terminals);
+
+                // вставляем метку-назначение2 после }
+                terminals.Insert(rightBraceIndex + 1, md2);
+            }
+            else
+            {
+                // вставляем метку-назначение1 после }
+                terminals.Insert(rightBraceIndex + 1, md1);
             }
         }
-        /// <summary>
-        /// Перевод терминала в символ ОПС
-        /// </summary>
-        public static RPNSymbol TranslateToRPNSymbol(Terminal input) => input.TerminalType switch
-        {
-            ETerminalType.Assignment => new RPNSymbol(ERPNType.F_Assignment),
-            ETerminalType.And => new RPNSymbol(ERPNType.F_And),
-            ETerminalType.Or => new RPNSymbol(ERPNType.F_Or),
-            ETerminalType.Equal => new RPNSymbol(ERPNType.F_Equal),
-            ETerminalType.Less => new RPNSymbol(ERPNType.F_Less),
-            ETerminalType.Greater => new RPNSymbol(ERPNType.F_Greater),
-            ETerminalType.LessEqual => new RPNSymbol(ERPNType.F_LessEqual),
-            ETerminalType.GreaterEqual => new RPNSymbol(ERPNType.F_GreaterEqual),
-            ETerminalType.Plus => new RPNSymbol(ERPNType.F_Plus),
-            ETerminalType.Minus => new RPNSymbol(ERPNType.F_Minus),
-            ETerminalType.Multiply => new RPNSymbol(ERPNType.F_Multiply),
-            ETerminalType.Divide => new RPNSymbol(ERPNType.F_Divide),
-            ETerminalType.Modulus => new RPNSymbol(ERPNType.F_Modulus),
-            ETerminalType.Not => new RPNSymbol(ERPNType.F_Not),
-            ETerminalType.Int => new RPNSymbol(ERPNType.F_Int),
-            ETerminalType.String => new RPNSymbol(ERPNType.F_String),
-            ETerminalType.Bool => new RPNSymbol(ERPNType.F_Bool),
-            ETerminalType.Input => new RPNSymbol(ERPNType.F_Input),
-            ETerminalType.Output => new RPNSymbol(ERPNType.F_Output),
-            ETerminalType.LeftBracket => new RPNSymbol(ERPNType.T_LeftBracket),
-            ETerminalType.RightBracket => new RPNSymbol(ERPNType.T_RightBracket),
-            ETerminalType.LeftParen => new RPNSymbol(ERPNType.T_LeftParen),
-            ETerminalType.RightParen => new RPNSymbol(ERPNType.T_RightParen),
-            ETerminalType.LeftBrace => new RPNSymbol(ERPNType.T_LeftBrace),
-            ETerminalType.RightBrace => new RPNSymbol(ERPNType.T_RightBrace),
-            ETerminalType.VariableName => new RPNSymbol(ERPNType.A_VariableName),
-            ETerminalType.Number => new RPNSymbol(ERPNType.A_Number),
-            ETerminalType.TextLine => new RPNSymbol(ERPNType.A_TextLine),
-            ETerminalType.Boolean => new RPNSymbol(ERPNType.A_Boolean),
-            ETerminalType.Semicolon => new RPNSymbol(ERPNType.T_Semicolon),
 
-            //ETerminalType.If => new RPNSymbol(ERPNType.ConditionalJumpToMark),
-            //ETerminalType.Else => new RPNSymbol(ERPNType.UnconditionalJumpToMark),
-            //ETerminalType.While => new RPNSymbol(ERPNType.ConditionalJumpToMark),
-            _ => throw new NotImplementedException("КРАШНУТЬСЯ НАФИГ")
-        };
         /// <summary>
-        /// Возвращает приоритет символа ОПС
+        /// Редактирование последовательности терминалов для работы объявления массивов и индексации
         /// </summary>
-        public static int GetRPNSymbolPriority(RPNSymbol input) => input.RPNType switch
+        /// <param name="terminals"></param>
+        public static void InsertLeftBracket(List<Terminal> terminals, int leftBracketPos)
         {
-            ERPNType.T_Semicolon => -1,
-            ERPNType.T_LeftParen => -1,
-            ERPNType.T_LeftBrace => -1,
-            ERPNType.T_LeftBracket => -1,
-            ERPNType.F_ConditionalJumpToMark => -1,
-            ERPNType.F_UnconditionalJumpToMark => -1,
-            ERPNType.М_Mark => -1,
-            ERPNType.F_Assignment => 0,
-            ERPNType.F_And => 1,
-            ERPNType.F_Or => 1,
-            ERPNType.F_Equal => 2,
-            ERPNType.F_Less => 2,
-            ERPNType.F_Greater => 2,
-            ERPNType.F_LessEqual => 2,
-            ERPNType.F_GreaterEqual => 2,
-            ERPNType.F_Plus => 3,
-            ERPNType.F_Minus => 3,
-            ERPNType.F_Multiply => 4,
-            ERPNType.F_Divide => 4,
-            ERPNType.F_Modulus => 4,
-            ERPNType.F_Not => 5,
-            ERPNType.F_Int => 6,
-            ERPNType.F_String => 6,
-            ERPNType.F_Bool => 6,
-            ERPNType.F_IntArray => 6,
-            ERPNType.F_StringArray => 6,
-            ERPNType.F_BoolArray => 6,
-            ERPNType.F_Input => 7,
-            ERPNType.F_Output => 7,
-            ERPNType.F_Index => 8,
-            _ => throw new NotImplementedException("КРАШНУТЬСЯ НАФИГ НО ПОНИЖЕ")
-        };
+            // если перед [ было название переменной
+            if (terminals[leftBracketPos - 1].TerminalType == ETerminal.VariableName)
+            {
+                // занчит это индексация по массиву
+
+                // находим парную ]
+                int rightBracketPos = FindPairedClosingBracket(leftBracketPos, terminals);
+                // вставляем GetByIndex
+                terminals.Insert(rightBracketPos + 1, new Terminal(ETerminal.GetByIndex));
+            }
+            OperationsStack.Push(terminals[leftBracketPos]);
+        }
+
         /// <summary>
-        /// Перевод функции инициализации одной переменной в функцию инициализации массива этого же типа
+        /// Генерация строкового представления ОПС
         /// </summary>
-        public static ERPNType ToArrayInit(RPNSymbol input) => input.RPNType switch
+        /// <returns></returns>
+        private static string RPNToString()
         {
-            ERPNType.F_Int => ERPNType.F_IntArray,
-            ERPNType.F_String => ERPNType.F_StringArray,
-            ERPNType.F_Bool => ERPNType.F_BoolArray,
-            _ => throw new NotImplementedException("КРАШНУТЬСЯ НАФИГ НО ЕЩЁ НИЖЕ")
-        };
+            string strRPN = string.Empty;
+
+            foreach (var terminal in RPN)
+            {
+                ETerminal terminalType = terminal.TerminalType;
+                switch (terminalType)
+                {
+                    case ETerminal.Number:
+                        strRPN += (terminal as Terminal.Number).Data.ToString();
+                        break;
+                    case ETerminal.TextLine:
+                        strRPN += $"{(terminal as Terminal.TextLine).Data}";
+                        break;
+                    case ETerminal.Boolean:
+                        strRPN += (terminal as Terminal.Boolean).Data.ToString();
+                        break;
+                    case ETerminal.VariableName:
+                        strRPN += (terminal as Terminal.VariableName).Name;
+                        break;
+                    case ETerminal.UnaryMinus:
+                        strRPN += '-';
+                        break;
+                    case ETerminal.Multiply:
+                        strRPN += '*';
+                        break;
+                    case ETerminal.Divide:
+                        strRPN += '/';
+                        break;
+                    case ETerminal.Modulus:
+                        strRPN += '%';
+                        break;
+                    case ETerminal.Plus:
+                        strRPN += '+';
+                        break;
+                    case ETerminal.Minus:
+                        strRPN += '-';
+                        break;
+                    case ETerminal.Less:
+                        strRPN += '<';
+                        break;
+                    case ETerminal.Greater:
+                        strRPN += '>';
+                        break;
+                    case ETerminal.LessEqual:
+                        strRPN += "<=";
+                        break;
+                    case ETerminal.GreaterEqual:
+                        strRPN += ">=";
+                        break;
+                    case ETerminal.Equal:
+                        strRPN += "==";
+                        break;
+                    case ETerminal.Not:
+                        strRPN += '!';
+                        break;
+                    case ETerminal.And:
+                        strRPN += "&&";
+                        break;
+                    case ETerminal.Or:
+                        strRPN += "||";
+                        break;
+                    case ETerminal.Assignment:
+                        strRPN += '=';
+                        break;
+                    case ETerminal.GetByIndex:
+                        strRPN += "GetByIndex";
+                        break;
+                    case ETerminal.CondMark:
+                        strRPN += "CondMark";
+                        break;
+                    case ETerminal.Int:
+                        strRPN += "Int";
+                        break;
+                    case ETerminal.IntArray:
+                        strRPN += "IntArray";
+                        break;
+                    case ETerminal.String:
+                        strRPN += "String";
+                        break;
+                    case ETerminal.StringArray:
+                        strRPN += "StringArray";
+                        break;
+                    case ETerminal.Bool:
+                        strRPN += "Bool";
+                        break;
+                    case ETerminal.BoolArray:
+                        strRPN += "BoolArray";
+                        break;
+                    case ETerminal.Output:
+                        strRPN += "Output";
+                        break;
+                    case ETerminal.Input:
+                        strRPN += "Input";
+                        break;
+                    case ETerminal.MarkPointer:
+                        strRPN += $"MP{(terminal as Terminal.MarkPointer).DestinationMark.DMID}";
+                        break;
+                    case ETerminal.MarkDestination:
+                        strRPN += $"MD{(terminal as Terminal.MarkDestination).DMID}";
+                        break;
+                    default:
+                        throw new NotImplementedException();
+                }
+                strRPN += ' ';
+            }
+            return strRPN;
+        }
     }
 }

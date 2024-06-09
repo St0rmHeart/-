@@ -1,402 +1,306 @@
 ﻿namespace Компилятор
 {
-   public enum ETerminalType
+    public enum ETerminal
     {
+        #region __________ДАННЫЕ__________
         /// <summary>
-        /// Целое число
+        /// Целое число - int
         /// </summary>
         Number,
-        
+
         /// <summary>
-        /// Строка текста
+        /// Строка текста - string
         /// </summary>
         TextLine,
-        
+
         /// <summary>
-        /// True или False
+        /// True или False - bool
         /// </summary>
         Boolean,
-        // Operators
-        
-        /// <summary>
-        /// +
-        /// </summary>
-        Plus,         // +
-        
-        /// <summary>
-        /// -
-        /// </summary>
-        Minus,        // -
-        
-        /// <summary>
-        /// *
-        /// </summary>
-        Multiply,     // *
-        
-        /// <summary>
-        /// /
-        /// </summary>
-        Divide,       // /
-        
-        /// <summary>
-        /// %
-        /// </summary>
-        Modulus,      // %
-        
-        /// <summary>
-        /// &&
-        /// </summary>
-        And,          // &&
-        
-        /// <summary>
-        /// ||
-        /// </summary>
-        Or,           // ||
-        
-        /// <summary>
-        /// !
-        /// </summary>
-        Not,          // !
 
-        // Parentheses and Brackets
-        
-        /// <summary>
-        /// (
-        /// </summary>
-        LeftParen,    // (
-        
-        /// <summary>
-        /// )
-        /// </summary>
-        RightParen,   // )
-        
-        /// <summary>
-        /// [
-        /// </summary>
-        LeftBracket,  // [
-        
-        /// <summary>
-        /// ]
-        /// </summary>
-        RightBracket, // ]
-        
-        /// <summary>
-        /// {
-        /// </summary>
-        LeftBrace,    // {
-        
-        /// <summary>
-        /// }
-        /// </summary>
-        RightBrace,   // }
-
-        // Quotation mark
-        /// <summary>
-        /// "
-        /// </summary>
-        DoubleQuote,  // “
-
-        // Assignment
-        /// <summary>
-        /// =
-        /// </summary>
-        Assignment,        // =
-
-        // Identifiers and keywords
-       
         /// <summary>
         /// Пользовательская переменная
         /// </summary>
-        VariableName,   // a...z, A...Z, _, а...я, А...Я
+        VariableName,
+        #endregion
+
+        #region __________ОПЕРАТОРЫ__________
+        /// <summary>
+        /// <br /> -A
+        /// <br /> унарная
+        /// <br /> 1. int
+        /// </summary>
+        UnaryMinus,
+
+        /// <summary>
+        /// <br /> A * B
+        /// <br /> бинарная
+        /// <br /> 1. int
+        /// <br /> 2. int
+        /// </summary>
+        Multiply,
+
+        /// <summary>
+        /// /
+        /// </summary>
+        Divide,
+
+        /// <summary>
+        /// <br /> A / B
+        /// <br /> бинарная
+        /// <br /> 1. int
+        /// <br /> 2. int
+        /// </summary>
+        Modulus,
+
+        /// <summary>
+        /// <br /> A + B
+        /// <br /> бинарная
+        /// <br /> 1. int, string
+        /// <br /> 2. int, string
+        /// </summary>
+        Plus,
+
+        /// <summary>
+        /// <br /> A - B
+        /// <br /> бинарная
+        /// <br /> 1. int
+        /// <br /> 2. int
+        /// </summary>
+        Minus,
+
+        /// <summary>
+        /// <br /> A &lt; B
+        /// <br /> бинарная
+        /// <br /> 1. int
+        /// <br /> 2. int
+        /// </summary>
+        Less,
+
+        /// /// <summary>
+        /// <br /> A &gt; B
+        /// <br /> бинарная
+        /// <br /> 1. int
+        /// <br /> 2. int
+        /// </summary>
+        Greater,
+
+        /// <summary>
+        /// <br /> A &lt;= B
+        /// <br /> бинарная
+        /// <br /> 1. int
+        /// <br /> 2. int
+        /// </summary>
+        LessEqual,
         
+        /// <summary>
+        /// <br /> A &gt;= B
+        /// <br /> бинарная
+        /// <br /> 1. int
+        /// <br /> 2. int
+        /// </summary>
+        GreaterEqual,
+
+        /// <summary>
+        /// <br /> A == B
+        /// <br /> бинарная
+        /// <br /> 1. bool
+        /// <br /> 2. bool
+        /// </summary>
+        Equal,
+
+        /// <summary>
+        /// <br /> !A
+        /// <br /> унарная
+        /// <br /> 1. bool
+        /// </summary>
+        Not,
+
+        /// <summary>
+        /// <br /> A && B
+        /// <br /> бинарная
+        /// <br /> 1. bool
+        /// <br /> 2. bool
+        /// </summary>
+        And,
+
+        /// <summary>
+        /// <br /> A || B
+        /// <br /> бинарная
+        /// <br /> 1. bool
+        /// <br /> 2. bool
+        /// </summary>
+        Or,
+
+        /// <summary>
+        /// <br /> a = b
+        /// <br /> бинарная
+        /// <br /> 1. variableName;
+        /// <br /> 2. string, int, bool;
+        /// <br /> переменная и данные должны быть одного типа
+        /// </summary>
+        Assignment,
+
+        /// <summary>
+        /// <br /> Взятие B-го элемента от массива A
+        /// <br /> бинарная
+        /// <br /> 1. variableName
+        /// <br /> 2. int
+        /// </summary>
+        GetByIndex,
+
+        /// <summary>
+        /// <br /> Если условие верное - перепрыгивает последующую ему метку
+        /// <br /> унарная
+        /// <br /> 1. bool
+        /// </summary>
+        CondMark,
+        #endregion
+
+        #region __________СИМВОЛЫ ГРУППИРОВКИ__________
+        /// <summary>
+        /// (
+        /// </summary>
+        LeftParen,
+
+        /// <summary>
+        /// )
+        /// </summary>
+        RightParen,
+
+        /// <summary>
+        /// [
+        /// </summary>
+        LeftBracket,
+
+        /// <summary>
+        /// ]
+        /// </summary>
+        RightBracket,
+
+        /// <summary>
+        /// {
+        /// </summary>
+        LeftBrace,
+
+        /// <summary>
+        /// }
+        /// </summary>
+        RightBrace,
+
+        /// <summary>
+        /// "
+        /// </summary>
+        DoubleQuote,
+
+        /// <summary>
+        /// ;
+        /// </summary>
+        Semicolon,
+        #endregion
+
+        #region __________КЛЮЧЕВЫЕ СЛОВА__________
         /// <summary>
         /// if
         /// </summary>
         If,
-        
+
         /// <summary>
         /// else
         /// </summary>
         Else,
-        
-        /// <summary>
-        /// ==
-        /// </summary>
-        Equal,        // ==
-        
-        /// <summary>
-        /// строго меньше 
-        /// </summary>
-        Less,         // <
-        
-        /// <summary>
-        /// >
-        /// </summary>
-        Greater,      // >
 
-        /// <summary>
-        /// меньше или равно 
-        /// </summary>
-        LessEqual,    // <=
-        
-        /// <summary>
-        /// >=
-        /// </summary>
-        GreaterEqual, // >=
-        
         /// <summary>
         /// while
         /// </summary>
         While,
-        
+
         /// <summary>
-        /// int
+        /// <br /> Создание перменной типа int
+        /// <br /> унарная
+        /// <br /> 1. variableName
         /// </summary>
         Int,
-        
+
         /// <summary>
-        /// string
+        /// <br /> Создание массива int именем B числом элементов A
+        /// <br /> бинарная
+        /// <br /> 1. variableName
+        /// <br /> 2. int
+        /// </summary>
+        IntArray = 60,
+
+        /// <summary>
+        /// <br /> Создание перменной типа string
+        /// <br /> унарная
+        /// <br /> 1. variableName
         /// </summary>
         String,
-        
+
         /// <summary>
-        /// bool
+        /// <br /> Создание массива string именем B числом элементов A
+        /// <br /> бинарная
+        /// <br /> 1. variableName
+        /// <br /> 2. int
+        /// </summary>
+        StringArray,
+
+        /// <summary>
+        /// <br /> Создание перменной типа bool
+        /// <br /> унарная
+        /// <br /> 1. variableName
         /// </summary>
         Bool,
-        
+
         /// <summary>
-        /// Функия вывода данных
+        /// <br /> Создание массива bool именем B числом элементов A
+        /// <br /> бинарная
+        /// <br /> 1. variableName
+        /// <br /> 2. int
+        /// </summary>
+        BoolArray,
+
+        /// <summary>
+        /// <br /> Output(A)
+        /// <br /> Унарная
+        /// <br /> 1. bool, int, string
         /// </summary>
         Output,
-        
+
         /// <summary>
-        /// Функция ввода данных в переменную
+        /// <br /> Input(A)
+        /// <br /> Унарная
+        /// <br /> 1. bool, int, string
         /// </summary>
         Input,
-        
-        /// <summary>
-        /// ;
-        /// </summary>
-        Semicolon 
-
-    }
-
-    //RPN = Reverse Polish Notation = Обратная польская нотация = ОПН = ОПС
-    public enum ERPNType
-    {
-        //ОПЕРАЦИИ
-        // При описании операций буквами A и B обозначены, соответственно, первый и второй аргументы, используемые в этой операции
-        // AB+ == A+B и т.д.
-
-        /// <summary>
-        /// Output(A)
-        /// </summary>
-        F_Output,
-
-        /// <summary>
-        /// Input(A)
-        /// </summary>
-        F_Input,
-
-        /// <summary>
-        /// a=b
-        /// </summary>
-        F_Assignment,    // =
-
-        /// <summary>
-        /// A&&B
-        /// </summary>
-        F_And,          // &&
-
-        /// <summary>
-        /// A||B
-        /// </summary>
-        F_Or,           // ||
-
-        /// <summary>
-        /// A==B
-        /// </summary>
-        F_Equal,        // ==
-
-        /// <summary>
-        /// A<B
-        /// </summary>
-        F_Less,         // <
-
-        /// <summary>
-        /// A>B
-        /// </summary>
-        F_Greater,      // >
-
-        /// <summary>
-        /// A<=B
-        /// </summary>
-        F_LessEqual,    // <=
-
-        /// <summary>
-        /// A>=B
-        /// </summary>
-        F_GreaterEqual, // >=
-
-        /// <summary>
-        /// A+B
-        /// </summary>
-        F_Plus,         // +
-
-        /// <summary>
-        /// A-B
-        /// </summary>
-        F_Minus,        // -
-
-        /// <summary>
-        /// A*B
-        /// </summary>
-        F_Multiply,     // *
-
-        /// <summary>
-        /// A/B
-        /// </summary>
-        F_Divide,       // /
-
-        /// <summary>
-        /// A%B
-        /// </summary>
-        F_Modulus,      // %
-
-        /// <summary>
-        /// !A
-        /// </summary>
-        F_Not,          // !
-
-        /// <summary>
-        /// Взятие B-го элемента от массива A
-        /// </summary>
-        F_Index,      //[]
-
-        /// <summary>
-        /// int
-        /// </summary>
-        F_Int,
-
-        /// <summary>
-        /// string
-        /// </summary>
-        F_String,
-
-        /// <summary>
-        /// Создание массива bool именем B числом элементов A
-        /// </summary>
-        F_Bool,
-
-        /// <summary>
-        /// Создание массива int именем B числом элементов A
-        /// </summary>
-        F_IntArray,
-
-        /// <summary>
-        /// Создание массива string именем B числом элементов A
-        /// </summary>
-        F_StringArray,
-
-        /// <summary>
-        /// bool
-        /// </summary>
-        F_BoolArray,
-
-        //АРГУМЕНТЫ
-
-        /// <summary>
-        /// Целое число
-        /// </summary>
-        A_Number,
-
-        /// <summary>
-        /// Строка текста
-        /// </summary>
-        A_TextLine,
-
-        /// <summary>
-        /// True или False
-        /// </summary>
-        A_Boolean,
-
-        /// <summary>
-        /// Пользовательcкая переменная
-        /// </summary>
-        A_VariableName,   // a...z, A...Z, _, а...я, А...Я
-
-        // Identifiers and keywords
-
-        /// <summary>
-        /// if
-        /// </summary>
-        T_If,
-
-        /// <summary>
-        /// else
-        /// </summary>
-        T_Else,
-
-        /// <summary>
-        /// while
-        /// </summary>
-        T_While,
-
-        /// <summary>
-        /// ;
-        /// </summary>
-        T_Semicolon,
-
-        /// <summary>
-        /// (
-        /// </summary>
-        T_LeftParen,    // (
-
-        /// <summary>
-        /// )
-        /// </summary>
-        T_RightParen,   // )
-
-        /// <summary>
-        /// [
-        /// </summary>
-        T_LeftBracket,  // [
-
-        /// <summary>
-        /// ]
-        /// </summary>
-        T_RightBracket, // ]
-
-        /// <summary>
-        /// {
-        /// </summary>
-        T_LeftBrace,    // {
-
-        /// <summary>
-        /// }
-        /// </summary>
-        T_RightBrace,   // }
-
-        /// <summary>
-        /// Если TRUE - выполняется идущий дальше код, ина  че - переход к MarkIf
-        /// </summary>
-        F_ConditionalJumpToMark,
-
-        /// <summary>
-        /// Безусловный переход к MarkElse
-        /// </summary>
-        F_UnconditionalJumpToMark,
+        #endregion
 
         /// <summary>
         /// Метка-указатель
         /// </summary>
-        М_Mark,
+        MarkPointer,
+
+        /// <summary>
+        /// Метка-назначение
+        /// </summary>
+        MarkDestination
     }
+
     public enum EMarkType
     {
+        None,
         WhileBeginMark,
         WhileEndMark,
         IfMark,
         ElseMark,
     }
+    public enum ETerminalGroup
+    {
+        Operator,
+        Data,
+        GroupSymbol,
+        Reserved,
+    }
+    #region __________Данные__________
+    #endregion
 }

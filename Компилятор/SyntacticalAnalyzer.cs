@@ -60,9 +60,9 @@
             var openingBracket = terminals[leftParenIndex].TerminalType;
             var closingBracket = openingBracket switch
             {
-                ETerminalType.LeftParen => ETerminalType.RightParen,
-                ETerminalType.LeftBrace => ETerminalType.RightBrace,
-                ETerminalType.LeftBracket => ETerminalType.RightBracket,
+                ETerminal.LeftParen => ETerminal.RightParen,
+                ETerminal.LeftBrace => ETerminal.RightBrace,
+                ETerminal.LeftBracket => ETerminal.RightBracket,
                 _ => throw new ArgumentException(),
             };
             int counter = 0;
@@ -98,12 +98,12 @@
             // 1.1 while ( <Логическое или> ) { <Блок инструкций> } <Последующая инструкция>
             Log = $"1.1 while ( <Логическое или> ) {{ <Блок инструкций> }} <Последующая инструкция> →";
             // если начинается с while
-            if (terminals.ElementAtOrDefault(0)?.TerminalType == ETerminalType.While)
+            if (terminals.ElementAtOrDefault(0)?.TerminalType == ETerminal.While)
             {
                 // предполагаемый индекс (
                 int leftParenIndex = 1;
                 // если по индексу действительно (
-                if (terminals.ElementAtOrDefault(leftParenIndex)?.TerminalType == ETerminalType.LeftParen)
+                if (terminals.ElementAtOrDefault(leftParenIndex)?.TerminalType == ETerminal.LeftParen)
                 {
                     // находим индекс парной )
                     int rightParenIndex = FindPairedClosingBracket(leftParenIndex, terminals);
@@ -113,7 +113,7 @@
                         // предполагаемый индекс {
                         int leftBraceIndex = rightParenIndex + 1;
                         // если по индексу действительно {
-                        if (terminals.ElementAtOrDefault(leftBraceIndex)?.TerminalType == ETerminalType.LeftBrace)
+                        if (terminals.ElementAtOrDefault(leftBraceIndex)?.TerminalType == ETerminal.LeftBrace)
                         {
                             // находим индекс парной }
                             int rightBraceIndex = FindPairedClosingBracket(leftBraceIndex, terminals);
@@ -145,12 +145,12 @@
             // 1.2 if ( <Логическое или> ) { <Блок инструкций> } <Последующая инструкция>
             Log = $"1.2 if ( <Логическое или> ) {{ <Блок инструкций> }} <Последующая инструкция> →";
             // если начинается с if
-            if (terminals.ElementAtOrDefault(0)?.TerminalType == ETerminalType.If)
+            if (terminals.ElementAtOrDefault(0)?.TerminalType == ETerminal.If)
             {
                 // предполагаемый индекс (
                 int leftParenIndex = 1;
                 // если по индексу действительно (
-                if (terminals.ElementAtOrDefault(leftParenIndex)?.TerminalType == ETerminalType.LeftParen)
+                if (terminals.ElementAtOrDefault(leftParenIndex)?.TerminalType == ETerminal.LeftParen)
                 {
                     // находим индекс парной )
                     int rightParenIndex = FindPairedClosingBracket(leftParenIndex, terminals);
@@ -160,7 +160,7 @@
                         // предполагаемый индекс {
                         int leftBraceIndex = rightParenIndex + 1;
                         // если по индексу действительно {
-                        if (terminals.ElementAtOrDefault(leftBraceIndex)?.TerminalType == ETerminalType.LeftBrace)
+                        if (terminals.ElementAtOrDefault(leftBraceIndex)?.TerminalType == ETerminal.LeftBrace)
                         {
                             // находим индекс парной }
                             int rightBraceIndex = FindPairedClosingBracket(leftBraceIndex, terminals);
@@ -192,12 +192,12 @@
             // 1.3 if ( <Логическое или> ) { <Блок инструкций> } <Последующая инструкция> else { <Блок инструкций> } <Последующая инструкция>
             Log = $"1.3 if ( <Логическое или> ) {{ <Блок инструкций> }} <Последующая инструкция> else {{ <Блок инструкций> }} <Последующая инструкция> →";
             // если начинается с if
-            if (terminals.ElementAtOrDefault(0)?.TerminalType == ETerminalType.If)
+            if (terminals.ElementAtOrDefault(0)?.TerminalType == ETerminal.If)
             {
                 // предполагаемый индекс (
                 int leftParenIndex = 1;
                 // если по индексу действительно (
-                if (terminals.ElementAtOrDefault(leftParenIndex)?.TerminalType == ETerminalType.LeftParen)
+                if (terminals.ElementAtOrDefault(leftParenIndex)?.TerminalType == ETerminal.LeftParen)
                 {
                     // находим индекс парной )
                     int rightParenIndex = FindPairedClosingBracket(leftParenIndex, terminals);
@@ -207,7 +207,7 @@
                         // предполагаемый индекс {
                         int firstLeftBraceIndex = rightParenIndex + 1;
                         // если по индексу действительно {
-                        if (terminals.ElementAtOrDefault(firstLeftBraceIndex)?.TerminalType == ETerminalType.LeftBrace)
+                        if (terminals.ElementAtOrDefault(firstLeftBraceIndex)?.TerminalType == ETerminal.LeftBrace)
                         {
                             // находим индекс парной }
                             int firstRightBraceIndex = FindPairedClosingBracket(firstLeftBraceIndex, terminals);
@@ -218,13 +218,13 @@
                                 int elseIndex = firstRightBraceIndex + 1;
 
                                 // если по индексу действительно else
-                                if (terminals.ElementAtOrDefault(elseIndex)?.TerminalType == ETerminalType.Else)
+                                if (terminals.ElementAtOrDefault(elseIndex)?.TerminalType == ETerminal.Else)
                                 {
                                     // предполагаемый индекс {
                                     int secondLeftBraceIndex = elseIndex + 1;
 
                                     // если по индексу действительно {
-                                    if (terminals.ElementAtOrDefault(secondLeftBraceIndex)?.TerminalType == ETerminalType.LeftBrace)
+                                    if (terminals.ElementAtOrDefault(secondLeftBraceIndex)?.TerminalType == ETerminal.LeftBrace)
                                     {
                                         // находим индекс парной }
                                         int secondRightBraceIndex = FindPairedClosingBracket(secondLeftBraceIndex, terminals);
@@ -261,13 +261,13 @@
             // 1.4 Input(<Идентификатор>) ; <Последующая инструкция>
             Log = $"1.4 Input(<Идентификатор>) ; <Последующая инструкция> →";
             // если начинается с Input
-            if (terminals.ElementAtOrDefault(0)?.TerminalType == ETerminalType.Input)
+            if (terminals.ElementAtOrDefault(0)?.TerminalType == ETerminal.Input)
             {
                 // предполагаемый индекс (
                 int leftParenIndex = 1;
 
                 // если по индексу действительно (
-                if (terminals.ElementAtOrDefault(leftParenIndex)?.TerminalType == ETerminalType.LeftParen)
+                if (terminals.ElementAtOrDefault(leftParenIndex)?.TerminalType == ETerminal.LeftParen)
                 {
                     // находим индекс парной )
                     int rightParenIndex = FindPairedClosingBracket(leftParenIndex, terminals);
@@ -278,7 +278,7 @@
                         int semicolonIndex = rightParenIndex + 1;
 
                         // если по индексу действительно ;
-                        if (terminals.ElementAtOrDefault(semicolonIndex)?.TerminalType == ETerminalType.Semicolon)
+                        if (terminals.ElementAtOrDefault(semicolonIndex)?.TerminalType == ETerminal.Semicolon)
                         {
                             // выделяем подпоследовательности для парсинга
                             var partForIdentifier = terminals[(leftParenIndex + 1)..rightParenIndex];
@@ -302,13 +302,13 @@
             // 1.5 Output(<Идентификатор>) ; <Последующая инструкция>
             Log = $"1.5 Output(<Идентификатор>) ; <Последующая инструкция> →";
             // если начинается с Input
-            if (terminals.ElementAtOrDefault(0)?.TerminalType == ETerminalType.Output)
+            if (terminals.ElementAtOrDefault(0)?.TerminalType == ETerminal.Output)
             {
                 // предполагаемый индекс (
                 int leftParenIndex = 1;
 
                 // если по индексу действительно (
-                if (terminals.ElementAtOrDefault(leftParenIndex)?.TerminalType == ETerminalType.LeftParen)
+                if (terminals.ElementAtOrDefault(leftParenIndex)?.TerminalType == ETerminal.LeftParen)
                 {
                     // находим индекс парной )
                     int rightParenIndex = FindPairedClosingBracket(leftParenIndex, terminals);
@@ -319,7 +319,7 @@
                         int semicolonIndex = rightParenIndex + 1;
 
                         // если по индексу действительно ;
-                        if (terminals.ElementAtOrDefault(semicolonIndex)?.TerminalType == ETerminalType.Semicolon)
+                        if (terminals.ElementAtOrDefault(semicolonIndex)?.TerminalType == ETerminal.Semicolon)
                         {
                             // выделяем подпоследовательности для парсинга
                             var partForIdentifier = terminals[(leftParenIndex + 1)..rightParenIndex];
@@ -341,7 +341,7 @@
             Log = $"1.5 Output(<Идентификатор>) ; <Последующая инструкция> → FALSE";
 
             // находим индекс первой точки с запятой
-            int firstSemicolon = terminals.FindIndex(t => t.TerminalType == ETerminalType.Semicolon);
+            int firstSemicolon = terminals.FindIndex(t => t.TerminalType == ETerminal.Semicolon);
 
             // 1.6 <Инициализация переменной> ; <Последующая инструкция>
             Log = $"1.6 <Инициализация переменной> ; <Последующая инструкция> →";
@@ -408,12 +408,12 @@
                 // 2.1 while ( <Логическое или> ) { <Блок инструкций> } <Последующая инструкция>
                 Log = $"2.1 while ( <Логическое или> ) {{ <Блок инструкций> }} <Последующая инструкция> →";
                 // если начинается с while
-                if (terminals.ElementAtOrDefault(0)?.TerminalType == ETerminalType.While)
+                if (terminals.ElementAtOrDefault(0)?.TerminalType == ETerminal.While)
                 {
                     // предполагаемый индекс (
                     int leftParenIndex = 1;
                     // если по индексу действительно (
-                    if (terminals.ElementAtOrDefault(leftParenIndex)?.TerminalType == ETerminalType.LeftParen)
+                    if (terminals.ElementAtOrDefault(leftParenIndex)?.TerminalType == ETerminal.LeftParen)
                     {
                         // находим индекс парной )
                         int rightParenIndex = FindPairedClosingBracket(leftParenIndex, terminals);
@@ -423,7 +423,7 @@
                             // предполагаемый индекс {
                             int leftBraceIndex = rightParenIndex + 1;
                             // если по индексу действительно {
-                            if (terminals.ElementAtOrDefault(leftBraceIndex)?.TerminalType == ETerminalType.LeftBrace)
+                            if (terminals.ElementAtOrDefault(leftBraceIndex)?.TerminalType == ETerminal.LeftBrace)
                             {
                                 // находим индекс парной }
                                 int rightBraceIndex = FindPairedClosingBracket(leftBraceIndex, terminals);
@@ -455,12 +455,12 @@
                 // 2.2 if ( <Логическое или> ) { <Блок инструкций> } <Последующая инструкция>
                 Log = $"2.2 if ( <Логическое или> ) {{ <Блок инструкций> }} <Последующая инструкция> →";
                 // если начинается с if
-                if (terminals.ElementAtOrDefault(0)?.TerminalType == ETerminalType.If)
+                if (terminals.ElementAtOrDefault(0)?.TerminalType == ETerminal.If)
                 {
                     // предполагаемый индекс (
                     int leftParenIndex = 1;
                     // если по индексу действительно (
-                    if (terminals.ElementAtOrDefault(leftParenIndex)?.TerminalType == ETerminalType.LeftParen)
+                    if (terminals.ElementAtOrDefault(leftParenIndex)?.TerminalType == ETerminal.LeftParen)
                     {
                         // находим индекс парной )
                         int rightParenIndex = FindPairedClosingBracket(leftParenIndex, terminals);
@@ -470,7 +470,7 @@
                             // предполагаемый индекс {
                             int leftBraceIndex = rightParenIndex + 1;
                             // если по индексу действительно {
-                            if (terminals.ElementAtOrDefault(leftBraceIndex)?.TerminalType == ETerminalType.LeftBrace)
+                            if (terminals.ElementAtOrDefault(leftBraceIndex)?.TerminalType == ETerminal.LeftBrace)
                             {
                                 // находим индекс парной }
                                 int rightBraceIndex = FindPairedClosingBracket(leftBraceIndex, terminals);
@@ -502,12 +502,12 @@
                 // 2.3 if ( <Логическое или> ) { <Блок инструкций> } <Последующая инструкция> else { <Блок инструкций> } <Последующая инструкция>
                 Log = $"2.3 if ( <Логическое или> ) {{ <Блок инструкций> }} <Последующая инструкция> else {{ <Блок инструкций> }} <Последующая инструкция> →";
                 // если начинается с if
-                if (terminals.ElementAtOrDefault(0)?.TerminalType == ETerminalType.If)
+                if (terminals.ElementAtOrDefault(0)?.TerminalType == ETerminal.If)
                 {
                     // предполагаемый индекс (
                     int leftParenIndex = 1;
                     // если по индексу действительно (
-                    if (terminals.ElementAtOrDefault(leftParenIndex)?.TerminalType == ETerminalType.LeftParen)
+                    if (terminals.ElementAtOrDefault(leftParenIndex)?.TerminalType == ETerminal.LeftParen)
                     {
                         // находим индекс парной )
                         int rightParenIndex = FindPairedClosingBracket(leftParenIndex, terminals);
@@ -517,7 +517,7 @@
                             // предполагаемый индекс {
                             int firstLeftBraceIndex = rightParenIndex + 1;
                             // если по индексу действительно {
-                            if (terminals.ElementAtOrDefault(firstLeftBraceIndex)?.TerminalType == ETerminalType.LeftBrace)
+                            if (terminals.ElementAtOrDefault(firstLeftBraceIndex)?.TerminalType == ETerminal.LeftBrace)
                             {
                                 // находим индекс парной }
                                 int firstRightBraceIndex = FindPairedClosingBracket(firstLeftBraceIndex, terminals);
@@ -528,13 +528,13 @@
                                     int elseIndex = firstRightBraceIndex + 1;
 
                                     // если по индексу действительно else
-                                    if (terminals.ElementAtOrDefault(elseIndex)?.TerminalType == ETerminalType.Else)
+                                    if (terminals.ElementAtOrDefault(elseIndex)?.TerminalType == ETerminal.Else)
                                     {
                                         // предполагаемый индекс {
                                         int secondLeftBraceIndex = elseIndex + 1;
 
                                         // если по индексу действительно {
-                                        if (terminals.ElementAtOrDefault(secondLeftBraceIndex)?.TerminalType == ETerminalType.LeftBrace)
+                                        if (terminals.ElementAtOrDefault(secondLeftBraceIndex)?.TerminalType == ETerminal.LeftBrace)
                                         {
                                             // находим индекс парной }
                                             int secondRightBraceIndex = FindPairedClosingBracket(secondLeftBraceIndex, terminals);
@@ -571,13 +571,13 @@
                 // 2.4 Input(<Идентификатор>) ; <Последующая инструкция>
                 Log = $"2.4 Input(<Идентификатор>) ; <Последующая инструкция> →";
                 // если начинается с Input
-                if (terminals.ElementAtOrDefault(0)?.TerminalType == ETerminalType.Input)
+                if (terminals.ElementAtOrDefault(0)?.TerminalType == ETerminal.Input)
                 {
                     // предполагаемый индекс (
                     int leftParenIndex = 1;
 
                     // если по индексу действительно (
-                    if (terminals.ElementAtOrDefault(leftParenIndex)?.TerminalType == ETerminalType.LeftParen)
+                    if (terminals.ElementAtOrDefault(leftParenIndex)?.TerminalType == ETerminal.LeftParen)
                     {
                         // находим индекс парной )
                         int rightParenIndex = FindPairedClosingBracket(leftParenIndex, terminals);
@@ -588,7 +588,7 @@
                             int semicolonIndex = rightParenIndex + 1;
 
                             // если по индексу действительно ;
-                            if (terminals.ElementAtOrDefault(semicolonIndex)?.TerminalType == ETerminalType.Semicolon)
+                            if (terminals.ElementAtOrDefault(semicolonIndex)?.TerminalType == ETerminal.Semicolon)
                             {
                                 // выделяем подпоследовательности для парсинга
                                 var partForIdentifier = terminals[(leftParenIndex + 1)..rightParenIndex];
@@ -612,13 +612,13 @@
                 // 2.5 Output(<Идентификатор>) ; <Последующая инструкция>
                 Log = $"2.5 Output(<Идентификатор>) ; <Последующая инструкция> →";
                 // если начинается с Input
-                if (terminals.ElementAtOrDefault(0)?.TerminalType == ETerminalType.Output)
+                if (terminals.ElementAtOrDefault(0)?.TerminalType == ETerminal.Output)
                 {
                     // предполагаемый индекс (
                     int leftParenIndex = 1;
 
                     // если по индексу действительно (
-                    if (terminals.ElementAtOrDefault(leftParenIndex)?.TerminalType == ETerminalType.LeftParen)
+                    if (terminals.ElementAtOrDefault(leftParenIndex)?.TerminalType == ETerminal.LeftParen)
                     {
                         // находим индекс парной )
                         int rightParenIndex = FindPairedClosingBracket(leftParenIndex, terminals);
@@ -629,7 +629,7 @@
                             int semicolonIndex = rightParenIndex + 1;
 
                             // если по индексу действительно ;
-                            if (terminals.ElementAtOrDefault(semicolonIndex)?.TerminalType == ETerminalType.Semicolon)
+                            if (terminals.ElementAtOrDefault(semicolonIndex)?.TerminalType == ETerminal.Semicolon)
                             {
                                 // выделяем подпоследовательности для парсинга
                                 var partForIdentifier = terminals[(leftParenIndex + 1)..rightParenIndex];
@@ -651,7 +651,7 @@
                 Log = $"2.5 Output(<Идентификатор>) ; <Последующая инструкция> → FALSE";
 
                 // находим индекс первой точки с запятой
-                int firstSemicolon = terminals.FindIndex(t => t.TerminalType == ETerminalType.Semicolon);
+                int firstSemicolon = terminals.FindIndex(t => t.TerminalType == ETerminal.Semicolon);
 
                 // 2.6 <Инициализация переменной> ; <Последующая инструкция>
                 Log = $"2.6 <Инициализация переменной> ; <Последующая инструкция> →";
@@ -728,19 +728,19 @@
                 // 3.1 int[ЧИСЛО] НАЗВАНИЕ ПЕРЕМЕННОЙ
                 Log = $"3.1 int[ЧИСЛО] НАЗВАНИЕ ПЕРЕМЕННОЙ →";
                 // если начинается с int
-                if (terminals.ElementAtOrDefault(0)?.TerminalType == ETerminalType.Int)
+                if (terminals.ElementAtOrDefault(0)?.TerminalType == ETerminal.Int)
                 {
                     // если следующий терминал [
-                    if (terminals.ElementAtOrDefault(1)?.TerminalType == ETerminalType.LeftBracket)
+                    if (terminals.ElementAtOrDefault(1)?.TerminalType == ETerminal.LeftBracket)
                     {
                         // если следующий терминал ЧИСЛО
-                        if (terminals.ElementAtOrDefault(2)?.TerminalType == ETerminalType.Number)
+                        if (terminals.ElementAtOrDefault(2)?.TerminalType == ETerminal.Number)
                         {
                             // если следующий терминал ]
-                            if (terminals.ElementAtOrDefault(3)?.TerminalType == ETerminalType.RightBracket)
+                            if (terminals.ElementAtOrDefault(3)?.TerminalType == ETerminal.RightBracket)
                             {
                                 // если следующий терминал идентификатор
-                                if (terminals.ElementAtOrDefault(4)?.TerminalType == ETerminalType.VariableName)
+                                if (terminals.ElementAtOrDefault(4)?.TerminalType == ETerminal.VariableName)
                                 {
                                     Log = $"3.1 int[ЧИСЛО] НАЗВАНИЕ ПЕРЕМЕННОЙ → TRUE";
                                     Tabs--;
@@ -757,19 +757,19 @@
                 // 3.2 bool[ЧИСЛО] НАЗВАНИЕ ПЕРЕМЕННОЙ
                 Log = $"3.2 bool[ЧИСЛО] НАЗВАНИЕ ПЕРЕМЕННОЙ →";
                 // если начинается с bool
-                if (terminals.ElementAtOrDefault(0)?.TerminalType == ETerminalType.Bool)
+                if (terminals.ElementAtOrDefault(0)?.TerminalType == ETerminal.Bool)
                 {
                     // если следующий терминал [
-                    if (terminals.ElementAtOrDefault(1)?.TerminalType == ETerminalType.LeftBracket)
+                    if (terminals.ElementAtOrDefault(1)?.TerminalType == ETerminal.LeftBracket)
                     {
                         // если следующий терминал ЧИСЛО
-                        if (terminals.ElementAtOrDefault(2)?.TerminalType == ETerminalType.Number)
+                        if (terminals.ElementAtOrDefault(2)?.TerminalType == ETerminal.Number)
                         {
                             // если следующий терминал ]
-                            if (terminals.ElementAtOrDefault(3)?.TerminalType == ETerminalType.RightBracket)
+                            if (terminals.ElementAtOrDefault(3)?.TerminalType == ETerminal.RightBracket)
                             {
                                 // если следующий терминал идентификатор
-                                if (terminals.ElementAtOrDefault(4)?.TerminalType == ETerminalType.VariableName)
+                                if (terminals.ElementAtOrDefault(4)?.TerminalType == ETerminal.VariableName)
                                 {
                                     Log = $"3.2 bool[ЧИСЛО] НАЗВАНИЕ ПЕРЕМЕННОЙ → TRUE";
                                     Tabs--;
@@ -786,19 +786,19 @@
                 // 3.3 string[ЧИСЛО] НАЗВАНИЕ ПЕРЕМЕННОЙ
                 Log = $"3.3 string[ЧИСЛО] НАЗВАНИЕ ПЕРЕМЕННОЙ →";
                 // если начинается с string
-                if (terminals.ElementAtOrDefault(0)?.TerminalType == ETerminalType.String)
+                if (terminals.ElementAtOrDefault(0)?.TerminalType == ETerminal.String)
                 {
                     // если следующий терминал [
-                    if (terminals.ElementAtOrDefault(1)?.TerminalType == ETerminalType.LeftBracket)
+                    if (terminals.ElementAtOrDefault(1)?.TerminalType == ETerminal.LeftBracket)
                     {
                         // если следующий терминал ЧИСЛО
-                        if (terminals.ElementAtOrDefault(2)?.TerminalType == ETerminalType.Number)
+                        if (terminals.ElementAtOrDefault(2)?.TerminalType == ETerminal.Number)
                         {
                             // если следующий терминал ]
-                            if (terminals.ElementAtOrDefault(3)?.TerminalType == ETerminalType.RightBracket)
+                            if (terminals.ElementAtOrDefault(3)?.TerminalType == ETerminal.RightBracket)
                             {
                                 // если следующий терминал идентификатор
-                                if (terminals.ElementAtOrDefault(4)?.TerminalType == ETerminalType.VariableName)
+                                if (terminals.ElementAtOrDefault(4)?.TerminalType == ETerminal.VariableName)
                                 {
                                     Log = $"3.3 string[ЧИСЛО] НАЗВАНИЕ ПЕРЕМЕННОЙ → TRUE";
                                     Tabs--;
@@ -819,10 +819,10 @@
                 // 3.4 int НАЗВАНИЕ ПЕРЕМЕННОЙ
                 Log = $"3.4 int НАЗВАНИЕ ПЕРЕМЕННОЙ →";
                 // если начинается с int
-                if (terminals.ElementAtOrDefault(0)?.TerminalType == ETerminalType.Int)
+                if (terminals.ElementAtOrDefault(0)?.TerminalType == ETerminal.Int)
                 {
                     // если следующий терминал идентификатор
-                    if (terminals.ElementAtOrDefault(1)?.TerminalType == ETerminalType.VariableName)
+                    if (terminals.ElementAtOrDefault(1)?.TerminalType == ETerminal.VariableName)
                     {
                         Log = $"3.4 int НАЗВАНИЕ ПЕРЕМЕННОЙ → TRUE";
                         Tabs--;
@@ -836,10 +836,10 @@
                 // 3.5 bool НАЗВАНИЕ ПЕРЕМЕННОЙ
                 Log = $"3.5 bool НАЗВАНИЕ ПЕРЕМЕННОЙ →";
                 // если начинается с bool
-                if (terminals.ElementAtOrDefault(0)?.TerminalType == ETerminalType.Bool)
+                if (terminals.ElementAtOrDefault(0)?.TerminalType == ETerminal.Bool)
                 {
                     // если следующий терминал идентификатор
-                    if (terminals.ElementAtOrDefault(1)?.TerminalType == ETerminalType.VariableName)
+                    if (terminals.ElementAtOrDefault(1)?.TerminalType == ETerminal.VariableName)
                     {
                         Log = $"3.5 bool НАЗВАНИЕ ПЕРЕМЕННОЙ → TRUE";
                         Tabs--;
@@ -853,10 +853,10 @@
                 // 3.6 string НАЗВАНИЕ ПЕРЕМЕННОЙ
                 Log = $"3.6 string НАЗВАНИЕ ПЕРЕМЕННОЙ →";
                 // если начинается с string
-                if (terminals.ElementAtOrDefault(0)?.TerminalType == ETerminalType.String)
+                if (terminals.ElementAtOrDefault(0)?.TerminalType == ETerminal.String)
                 {
                     // если следующий терминал идентификатор
-                    if (terminals.ElementAtOrDefault(1)?.TerminalType == ETerminalType.VariableName)
+                    if (terminals.ElementAtOrDefault(1)?.TerminalType == ETerminal.VariableName)
                     {
                         Log = $"3.6 string НАЗВАНИЕ ПЕРЕМЕННОЙ → TRUE";
                         Tabs--;
@@ -888,7 +888,7 @@
             // 4.1 <Идентификатор> = <Аргумент присваивания>
             Log = $"4.1 <Идентификатор> = <Аргумент присваивания> →";
             // находим индекс первого =
-            int firstAssignment = terminals.FindIndex(t => t.TerminalType == ETerminalType.Assignment);
+            int firstAssignment = terminals.FindIndex(t => t.TerminalType == ETerminal.Assignment);
 
             // если = нашелся
             if (firstAssignment != -1)
@@ -983,7 +983,7 @@
             Log = $"6. <Логическое ИЛИ> →";
             Tabs++;
             // находим индекс первого ||
-            int firstLogicalOR = terminals.FindIndex(t => t.TerminalType == ETerminalType.Or);
+            int firstLogicalOR = terminals.FindIndex(t => t.TerminalType == ETerminal.Or);
 
             // 6.1 <Логическое И> || <Логическое ИЛИ>
             Log = $"6.1 <Логическое И> || <Логическое ИЛИ> →";
@@ -1039,7 +1039,7 @@
             // 7.1 <Аргумент логического И> && <Логическое И>
             Log = $"7.1 <Аргумент логического И> && <Логическое И> →";
             // находим индекс первого &&
-            int firstLogicalAND = terminals.FindIndex(t => t.TerminalType == ETerminalType.And);
+            int firstLogicalAND = terminals.FindIndex(t => t.TerminalType == ETerminal.And);
             // если && нашелся
             if (firstLogicalAND != -1)
             {
@@ -1148,7 +1148,7 @@
             // 9.1 !<Аргумент отрицания>
             Log = $"9.1 !<Аргумент отрицания> →";
             // если первый терминал !
-            if (terminals.ElementAtOrDefault(0)?.TerminalType == ETerminalType.Not)
+            if (terminals.ElementAtOrDefault(0)?.TerminalType == ETerminal.Not)
             {
                 // выделяем подпоследовательность для парсинга
                 var partForNegationArgument = terminals[1..];
@@ -1197,7 +1197,7 @@
             // 10.1 (<Логическое или>)
             Log = $"10.1 (<Логическое или>) →";
             // если первый терминал (
-            if (terminals.ElementAtOrDefault(0)?.TerminalType == ETerminalType.LeftParen)
+            if (terminals.ElementAtOrDefault(0)?.TerminalType == ETerminal.LeftParen)
             {
                 // находим индекс парной )
                 int rightParenIndex = FindPairedClosingBracket(0, terminals);
@@ -1242,7 +1242,7 @@
             if (terminals.Count == 1)
             {
                 // если первый терминал булеан
-                if (terminals.ElementAtOrDefault(0)?.TerminalType == ETerminalType.Boolean)
+                if (terminals.ElementAtOrDefault(0)?.TerminalType == ETerminal.Boolean)
                 {
                     Log = $"10.3 БУЛЕАН → TRUE";
                     Tabs--;
@@ -1272,7 +1272,7 @@
             Tabs++;
 
             // находим индекс первого ==
-            int firstEqual = terminals.FindIndex(t => t.TerminalType == ETerminalType.Equal);
+            int firstEqual = terminals.FindIndex(t => t.TerminalType == ETerminal.Equal);
 
             // 11.1 <Конкатенация> == <Конкатенация>
             Log = $"11.1 <Конкатенация> == <Конкатенация> →";
@@ -1315,7 +1315,7 @@
             // 12.1 <Аргумент конкатенации> + <Конкатенация>
             Log = $"12.1 <Аргумент конкатенации> + <Конкатенация> →";
             // находим индекс первого +
-            int firstPlus = terminals.FindIndex(t => t.TerminalType == ETerminalType.Plus);
+            int firstPlus = terminals.FindIndex(t => t.TerminalType == ETerminal.Plus);
             // если + нашелся
             if (firstPlus != -1)
             {
@@ -1384,7 +1384,7 @@
             if (terminals.Count == 1)
             {
                 // если первый терминал булеан
-                if (terminals.ElementAtOrDefault(0)?.TerminalType == ETerminalType.TextLine)
+                if (terminals.ElementAtOrDefault(0)?.TerminalType == ETerminal.TextLine)
                 {
                     Log = $"13.2 СТРОКА → TRUE";
                     Tabs--;
@@ -1415,12 +1415,12 @@
             // 14.1 <Сложение и вычитание> ОПЕРАТОР СРАВНЕНИЯ <Сложение и вычитание>
             Log = $"14.1 <Сложение и вычитание> ОПЕРАТОР СРАВНЕНИЯ <Сложение и вычитание> →";
             // берём все операторы сравнения
-            ETerminalType[] comparsions =
-                [ETerminalType.Greater,
-                ETerminalType.Less,
-                ETerminalType.Equal,
-                ETerminalType.GreaterEqual,
-                ETerminalType.LessEqual];
+            ETerminal[] comparsions =
+                [ETerminal.Greater,
+                ETerminal.Less,
+                ETerminal.Equal,
+                ETerminal.GreaterEqual,
+                ETerminal.LessEqual];
             // для каждого оператора сравнения
             foreach (var comparsionType in comparsions)
             {
@@ -1476,7 +1476,7 @@
             // 16.1 <Умножение и деление> + <Сложение и вычитание>
             Log = $"16.1 <Умножение и деление> + <Сложение и вычитание> →";
             // находим индекс первого +
-            int firstPlus = terminals.FindIndex(t => t.TerminalType == ETerminalType.Plus);
+            int firstPlus = terminals.FindIndex(t => t.TerminalType == ETerminal.Plus);
             // если + нашелся
             if (firstPlus != -1)
             {
@@ -1499,7 +1499,7 @@
             // 16.2 <Умножение и деление> - <Сложение и вычитание>
             Log = $"16.2 <Умножение и деление> - <Сложение и вычитание> →";
             // находим индекс первого -
-            int firstMinus = terminals.FindIndex(t => t.TerminalType == ETerminalType.Minus);
+            int firstMinus = terminals.FindIndex(t => t.TerminalType == ETerminal.Minus);
             // если - нашелся
             if (firstMinus != -1)
             {
@@ -1552,7 +1552,7 @@
             // 17.1 <Унарный минус> * <Умножение и деление>
             Log = $"17.1 <Унарный минус> * <Умножение и деление> →";
             // находим индекс первого *
-            int firstMultiply = terminals.FindIndex(t => t.TerminalType == ETerminalType.Multiply);
+            int firstMultiply = terminals.FindIndex(t => t.TerminalType == ETerminal.Multiply);
             // если * нашелся
             if (firstMultiply != -1)
             {
@@ -1575,7 +1575,7 @@
             // 17.2 <Унарный минус> / <Умножение и деление> 
             Log = $"17.2 <Унарный минус> / <Умножение и деление> →";
             // находим индекс первого /
-            int firstDivide = terminals.FindIndex(t => t.TerminalType == ETerminalType.Divide);
+            int firstDivide = terminals.FindIndex(t => t.TerminalType == ETerminal.Divide);
             // если / нашелся
             if (firstDivide != -1)
             {
@@ -1598,7 +1598,7 @@
             // 17.3 <Унарный минус> % <Умножение и деление>
             Log = $"17.3 <Унарный минус> % <Умножение и деление> →";
             // находим индекс первого %
-            int firstModulus = terminals.FindIndex(t => t.TerminalType == ETerminalType.Modulus);
+            int firstModulus = terminals.FindIndex(t => t.TerminalType == ETerminal.Modulus);
             // если % нашелся
             if (firstModulus != -1)
             {
@@ -1651,7 +1651,7 @@
             // 18.1 !<Аргумент унарного минуса>
             Log = $"18.1 !<Аргумент унарного минуса> →";
             // если первый терминал -
-            if (terminals.ElementAtOrDefault(0)?.TerminalType == ETerminalType.Minus)
+            if (terminals.ElementAtOrDefault(0)?.TerminalType == ETerminal.Minus)
             {
                 // выделяем подпоследовательность для парсинга
                 var partForUnaryMinusArgument = terminals[1..];
@@ -1700,7 +1700,7 @@
             // 19.1 (<Сложение и вычитание>)
             Log = $"19.1 (<Сложение и вычитание>) →";
             // если первый терминал (
-            if (terminals.ElementAtOrDefault(0)?.TerminalType == ETerminalType.LeftParen)
+            if (terminals.ElementAtOrDefault(0)?.TerminalType == ETerminal.LeftParen)
             {
                 // находим индекс парной )
                 int rightParenIndex = FindPairedClosingBracket(0, terminals);
@@ -1745,7 +1745,7 @@
             if (terminals.Count == 1)
             {
                 // если первый терминал число
-                if (terminals.ElementAtOrDefault(0)?.TerminalType == ETerminalType.Number)
+                if (terminals.ElementAtOrDefault(0)?.TerminalType == ETerminal.Number)
                 {
                     Log = $"19.3 ЧИСЛО → TRUE";
                     Tabs--;
@@ -1776,12 +1776,12 @@
             // 20.1 НАЗВАНИЕ ПЕРЕМЕННОЙ[<Индексатор>]
             Log = $"20.1 НАЗВАНИЕ ПЕРЕМЕННОЙ[<Индексатор>] →";
             // если первый терминал имяПеременной
-            if (terminals.ElementAtOrDefault(0)?.TerminalType == ETerminalType.VariableName)
+            if (terminals.ElementAtOrDefault(0)?.TerminalType == ETerminal.VariableName)
             {
                 // предполагаемый индекс [
                 int leftBracketIndex = 1;
                 // если по индексу действительно [
-                if (terminals.ElementAtOrDefault(leftBracketIndex)?.TerminalType == ETerminalType.LeftBracket)
+                if (terminals.ElementAtOrDefault(leftBracketIndex)?.TerminalType == ETerminal.LeftBracket)
                 {
                     // находим индекс парной ]
                     int rightBracketIndex = FindPairedClosingBracket(leftBracketIndex, terminals);
@@ -1814,7 +1814,7 @@
             if (terminals.Count == 1)
             {
                 // если первый название переменной
-                if (terminals.ElementAtOrDefault(0)?.TerminalType == ETerminalType.VariableName)
+                if (terminals.ElementAtOrDefault(0)?.TerminalType == ETerminal.VariableName)
                 {
                     Log = $"20.2 НАЗВАНИЕ ПЕРЕМЕННОЙ → TRUE";
                     Tabs--;
@@ -1845,12 +1845,12 @@
             // 21.1 НАЗВАНИЕ ПЕРЕМЕННОЙ[<Индексатор>]
             Log = $"21.1 НАЗВАНИЕ ПЕРЕМЕННОЙ[<Индексатор>] →";
             // если первый терминал имяПеременной
-            if (terminals.ElementAtOrDefault(0)?.TerminalType == ETerminalType.VariableName)
+            if (terminals.ElementAtOrDefault(0)?.TerminalType == ETerminal.VariableName)
             {
                 // предполагаемый индекс [
                 int leftBracketIndex = 1;
                 // если по индексу действительно [
-                if (terminals.ElementAtOrDefault(leftBracketIndex)?.TerminalType == ETerminalType.LeftBracket)
+                if (terminals.ElementAtOrDefault(leftBracketIndex)?.TerminalType == ETerminal.LeftBracket)
                 {
                     // находим индекс парной ]
                     int rightBracketIndex = FindPairedClosingBracket(leftBracketIndex, terminals);
@@ -1883,7 +1883,7 @@
             if (terminals.Count == 1)
             {
                 // если первый терминал число
-                if (terminals.ElementAtOrDefault(0)?.TerminalType == ETerminalType.VariableName)
+                if (terminals.ElementAtOrDefault(0)?.TerminalType == ETerminal.VariableName)
                 {
                     Log = $"21.2 НАЗВАНИЕ ПЕРЕМЕННОЙ → TRUE";
                     Tabs--;
@@ -1900,7 +1900,7 @@
             if (terminals.Count == 1)
             {
                 // если первый терминал число
-                if (terminals.ElementAtOrDefault(0)?.TerminalType == ETerminalType.Number)
+                if (terminals.ElementAtOrDefault(0)?.TerminalType == ETerminal.Number)
                 {
                     Log = $"21.3 ЧИСЛО → TRUE";
                     Tabs--;
@@ -1917,7 +1917,7 @@
             if (terminals.Count == 1)
             {
                 // если первый терминал число
-                if (terminals.ElementAtOrDefault(0)?.TerminalType == ETerminalType.Number)
+                if (terminals.ElementAtOrDefault(0)?.TerminalType == ETerminal.Number)
                 {
                     Log = $"21.3 ЧИСЛО → TRUE";
                     Tabs--;
