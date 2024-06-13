@@ -294,6 +294,7 @@ namespace Компилятор
 
                     // Поиск индекса объекта с заданным DMID
                     int index = RPN.FindIndex(t => t is Terminal.MarkDestination md && md.DMID == targetDMID);
+                    markPointer.Destination = index;
                 }
             }
             File.WriteAllText("RPN.txt", RPNToString());
@@ -444,108 +445,48 @@ namespace Компилятор
         private static string RPNToString()
         {
             string strRPN = string.Empty;
+            int i = 0;
 
             foreach (var terminal in RPN)
             {
+                i++;
+                strRPN += $"\n{i.ToString() + '.',4} ";
                 ETerminal terminalType = terminal.TerminalType;
-                switch (terminalType)
+                strRPN += terminalType switch
                 {
-                    case ETerminal.Number:
-                        strRPN += (terminal as Terminal.Number).Data.ToString();
-                        break;
-                    case ETerminal.TextLine:
-                        strRPN += $"{(terminal as Terminal.TextLine).Data}";
-                        break;
-                    case ETerminal.Boolean:
-                        strRPN += (terminal as Terminal.Boolean).Data.ToString();
-                        break;
-                    case ETerminal.VariableName:
-                        strRPN += (terminal as Terminal.VariableName).Name;
-                        break;
-                    case ETerminal.UnaryMinus:
-                        strRPN += '-';
-                        break;
-                    case ETerminal.Multiply:
-                        strRPN += '*';
-                        break;
-                    case ETerminal.Divide:
-                        strRPN += '/';
-                        break;
-                    case ETerminal.Modulus:
-                        strRPN += '%';
-                        break;
-                    case ETerminal.Plus:
-                        strRPN += '+';
-                        break;
-                    case ETerminal.Minus:
-                        strRPN += '-';
-                        break;
-                    case ETerminal.Less:
-                        strRPN += '<';
-                        break;
-                    case ETerminal.Greater:
-                        strRPN += '>';
-                        break;
-                    case ETerminal.LessEqual:
-                        strRPN += "<=";
-                        break;
-                    case ETerminal.GreaterEqual:
-                        strRPN += ">=";
-                        break;
-                    case ETerminal.Equal:
-                        strRPN += "==";
-                        break;
-                    case ETerminal.Not:
-                        strRPN += '!';
-                        break;
-                    case ETerminal.And:
-                        strRPN += "&&";
-                        break;
-                    case ETerminal.Or:
-                        strRPN += "||";
-                        break;
-                    case ETerminal.Assignment:
-                        strRPN += '=';
-                        break;
-                    case ETerminal.GetByIndex:
-                        strRPN += "GetByIndex";
-                        break;
-                    case ETerminal.CondMark:
-                        strRPN += "CondMark";
-                        break;
-                    case ETerminal.Int:
-                        strRPN += "Int";
-                        break;
-                    case ETerminal.IntArray:
-                        strRPN += "IntArray";
-                        break;
-                    case ETerminal.String:
-                        strRPN += "String";
-                        break;
-                    case ETerminal.StringArray:
-                        strRPN += "StringArray";
-                        break;
-                    case ETerminal.Bool:
-                        strRPN += "Bool";
-                        break;
-                    case ETerminal.BoolArray:
-                        strRPN += "BoolArray";
-                        break;
-                    case ETerminal.Output:
-                        strRPN += "Output";
-                        break;
-                    case ETerminal.Input:
-                        strRPN += "Input";
-                        break;
-                    case ETerminal.MarkPointer:
-                        strRPN += $"MP{(terminal as Terminal.MarkPointer).DestinationMark.DMID}";
-                        break;
-                    case ETerminal.MarkDestination:
-                        strRPN += $"MD{(terminal as Terminal.MarkDestination).DMID}";
-                        break;
-                    default:
-                        throw new NotImplementedException();
-                }
+                    ETerminal.Number => (terminal as Terminal.Number).Data.ToString(),
+                    ETerminal.TextLine => $"{(terminal as Terminal.TextLine).Data}",
+                    ETerminal.Boolean => (terminal as Terminal.Boolean).Data.ToString(),
+                    ETerminal.VariableName => (terminal as Terminal.VariableName).Name,
+                    ETerminal.UnaryMinus => '-',
+                    ETerminal.Multiply => '*',
+                    ETerminal.Divide => '/',
+                    ETerminal.Modulus => '%',
+                    ETerminal.Plus => '+',
+                    ETerminal.Minus => '-',
+                    ETerminal.Less => '<',
+                    ETerminal.Greater => '>',
+                    ETerminal.LessEqual => "<=",
+                    ETerminal.GreaterEqual => ">=",
+                    ETerminal.Equal => "==",
+                    ETerminal.Not => '!',
+                    ETerminal.And => "&&",
+                    ETerminal.Or => "||",
+                    ETerminal.Assignment => '=',
+                    ETerminal.GetByIndex => "GetByIndex",
+                    ETerminal.CondMark => "CondMark",
+                    ETerminal.Int => "Int",
+                    ETerminal.IntArray => "IntArray",
+                    ETerminal.String => "String",
+                    ETerminal.StringArray => "StringArray",
+                    ETerminal.Bool => "Bool",
+                    ETerminal.BoolArray => "BoolArray",
+                    ETerminal.Output => "Output",
+                    ETerminal.Input => "Input",
+                    ETerminal.MarkPointer => $"MP{(terminal as Terminal.MarkPointer).DestinationMark.DMID}",
+                    ETerminal.MarkDestination => $"MD{(terminal as Terminal.MarkDestination).DMID}",
+                    _ => throw new NotImplementedException(),
+                };
                 strRPN += ' ';
             }
             return strRPN;

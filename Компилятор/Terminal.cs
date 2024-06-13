@@ -1,4 +1,6 @@
-﻿namespace Компилятор
+﻿using static System.Runtime.InteropServices.JavaScript.JSType;
+
+namespace Компилятор
 {
     public class Terminal
     {
@@ -28,6 +30,11 @@
                 if (type != ETerminal.TextLine) throw new ArgumentException("Неверно создан нетерминал");
                 Data = data;
             }
+            public TextLine(ETerminal type, string data) : base(type)
+            {
+                if (type != ETerminal.TextLine) throw new ArgumentException("Неверно создан нетерминал");
+                Data = data;
+            }
         }
         public class Number : Terminal
         {
@@ -36,6 +43,11 @@
             {
                 if (type != ETerminal.Number) throw new ArgumentException("Неверно создан нетерминал");
                 Data = Convert.ToInt32(data);
+            }
+            public Number(ETerminal type, int data) : base(type)
+            {
+                if (type != ETerminal.Number) throw new ArgumentException("Неверно создан нетерминал");
+                Data = data;
             }
         }
         public class Boolean : Terminal
@@ -46,6 +58,12 @@
                 if (type != ETerminal.Boolean) throw new ArgumentException("Неверно создан нетерминал");
                 Data = Convert.ToBoolean(data);
             }
+            public Boolean(ETerminal type, bool data) : base(type)
+            {
+                if (type != ETerminal.Boolean) throw new ArgumentException("Неверно создан нетерминал");
+                Data = data;
+            }
+
         }
         public class VariableName : Terminal
         {
@@ -54,6 +72,11 @@
             {
                 if (type != ETerminal.VariableName) throw new ArgumentException("Неверно создан нетерминал");
                 Name = data;
+            }
+            public VariableName(ETerminal type, string name) : base(type)
+            {
+                if (type != ETerminal.VariableName) throw new ArgumentException("Неверно создан нетерминал");
+                Name = name;
             }
         }
         public class MarkDestination : Terminal

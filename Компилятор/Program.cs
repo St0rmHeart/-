@@ -27,6 +27,7 @@ namespace Компилятор
             {
                 throw new Exception();
             }
+            RPNReader.ExecuteRPN(rpn);
             
         }
     }
